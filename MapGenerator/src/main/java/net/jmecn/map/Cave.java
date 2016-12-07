@@ -14,9 +14,9 @@ public class Cave extends MapCreator {
 
 	protected int randPick() {
 		if (rand.nextInt(100) < fillprob) {
-			return WALL;
+			return DirtWall;
 		} else {
-			return FLOOR;
+			return Unused;
 		}
 	}
 	
@@ -28,7 +28,7 @@ public class Cave extends MapCreator {
 		for(int y=0; y<h; y++) {
 			for(int x=0; x<w; x++) {
 				if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
-					data[y][x] = WALL;
+					data[y][x] = DirtWall;
 				} else {
 					data[y][x] = randPick();
 				}
@@ -56,7 +56,7 @@ public class Cave extends MapCreator {
 				int m = 0;
 				for(int offsety=-1; offsety<=1; offsety++) {
 					for(int offsetx=-1; offsetx<=1; offsetx++) {
-						if (data[offsety+y][offsetx+x] == WALL) {
+						if (data[offsety+y][offsetx+x] == DirtWall) {
 							m++;
 						}
 					}
@@ -69,7 +69,7 @@ public class Cave extends MapCreator {
 							continue;
 						}
 						
-						if (map.contains(x+offsetx, y+offsety) && data[offsety+y][offsetx+x] == WALL) {
+						if (map.contains(x+offsetx, y+offsety) && data[offsety+y][offsetx+x] == StoneWall) {
 							n++;
 						}
 					}
@@ -77,9 +77,9 @@ public class Cave extends MapCreator {
 				
 				
 				if (m >= r1Cutoff || n <= r2Cutoff) {
-					tmp[y][x] = WALL;
+					tmp[y][x] = DirtWall;
 				} else {
-					tmp[y][x] = FLOOR;
+					tmp[y][x] = Unused;
 				}
 				
 			}
