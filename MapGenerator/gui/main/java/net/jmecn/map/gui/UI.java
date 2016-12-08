@@ -75,10 +75,10 @@ public class UI extends JFrame {
 	
 	public UI() {
 		try {
-			width = Integer.parseInt(res.getString("creater.width"));
-			height = Integer.parseInt(res.getString("creater.height"));
-			seed = md5(res.getString("creater.seed"));
-			isRand = Boolean.valueOf(res.getString("creater.isRand"));
+			width = Integer.parseInt(res.getString("creator.width"));
+			height = Integer.parseInt(res.getString("creator.height"));
+			seed = md5(res.getString("creator.seed"));
+			isRand = Boolean.valueOf(res.getString("creator.isRand"));
 			pixel = Integer.parseInt(res.getString("canvas.pixel"));
 		} catch (Exception e) {
 			width = 40;
@@ -227,9 +227,9 @@ public class UI extends JFrame {
 		toolBar.setAlignmentY(5);
 		
 		final JComboBox<String> combo = new JComboBox<String>();
-		combo.addItem(res.getString("creater.cave.name"));
-		combo.addItem(res.getString("creater.dungeon.name"));
-		combo.addItem(res.getString("creater.maze.name"));
+		combo.addItem(res.getString("creator.cave.name"));
+		combo.addItem(res.getString("creator.dungeon.name"));
+		combo.addItem(res.getString("creator.maze.name"));
 		
 		combo.addActionListener(new ActionListener() {
 			@Override
@@ -275,7 +275,7 @@ public class UI extends JFrame {
 		});
 		addTool(toolBar, colSlider);
 		
-		final JLabel l3 = new JLabel(MessageFormat.format(res.getString("creater.cave.fillprob"), fillprob));
+		final JLabel l3 = new JLabel(MessageFormat.format(res.getString("creator.cave.fillprob"), fillprob));
 		addTool(toolBar, l3);
 		final JSlider probSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, fillprob);
 		probSlider.setMajorTickSpacing(10);
@@ -284,7 +284,7 @@ public class UI extends JFrame {
 		probSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				fillprob = probSlider.getValue();
-				l3.setText(MessageFormat.format(res.getString("creater.cave.fillprob"), fillprob));
+				l3.setText(MessageFormat.format(res.getString("creator.cave.fillprob"), fillprob));
 				updateCave();
 			}
 		});
@@ -321,7 +321,7 @@ public class UI extends JFrame {
 		JLabel l4 = new JLabel(res.getString("label.seed"));
 		addTool(toolBar, l4);
 
-		seedText.setText(res.getString("creater.seed"));
+		seedText.setText(res.getString("creator.seed"));
 		addTool(toolBar, seedText);
 
 		JButton refreshBtn = new JButton(res.getString("btn.create"));
