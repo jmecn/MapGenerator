@@ -33,7 +33,10 @@ public class Map2D {
 	}
 
 	public int get(int x, int y) {
-		return map[y][x];
+		if (contains(x, y))
+			return map[y][x];
+		else
+			return -1;
 	}
 
 	public void setCells(int xStart, int yStart, int xEnd, int yEnd, int cellType) {

@@ -1,36 +1,33 @@
-package net.jmecn.map;
+package net.jmecn.map.creator;
 
 import static net.jmecn.map.Tile.*;
 
 public class Cave extends MapCreator {
 
-	final static private int fillprob = 45;
+	private int fillprob = 45;
 	final static private int r1Cutoff = 5;
 	final static private int r2Cutoff = 2;
 	
-	public Cave(int x, int y) {
-		super(x, y);
+	public Cave(int width, int height) {
+		super(width, height);
 	}
 
 	protected int randPick() {
 		if (rand.nextInt(100) < fillprob) {
 			return DirtWall;
 		} else {
-			return Unused;
+			return DirtFloor;
 		}
 	}
 	
 	@Override
 	public void initialze() {
-		int[][] data = map.getMap();
-		int w = map.getWidth();
-		int h = map.getHeight();
-		for(int y=0; y<h; y++) {
-			for(int x=0; x<w; x++) {
-				if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
-					data[y][x] = DirtWall;
+		for(int y=0; y<height; y++) {
+			for(int x=0; x<width; x++) {
+				if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
+					map.set(x, y, DirtWall);
 				} else {
-					data[y][x] = randPick();
+					map.set(x, y, randPick());
 				}
 			}
 		}
@@ -46,17 +43,13 @@ public class Cave extends MapCreator {
 
 	protected void generation() {
 		int[][] tmp = copy();
-		int[][] data = map.getMap();
-		int w = map.getWidth();
-		int h = map.getHeight();
-		
-		for(int y=1; y<h-1; y++) {
-			for(int x=1; x<w-1; x++) {
+		for(int y=1; y<height-1; y++) {
+			for(int x=1; x<width-1; x++) {
 				
 				int m = 0;
 				for(int offsety=-1; offsety<=1; offsety++) {
 					for(int offsetx=-1; offsetx<=1; offsetx++) {
-						if (data[offsety+y][offsetx+x] == DirtWall) {
+						if (map.get(offsetx+x, offsety+y) == DirtWall) {
 							m++;
 						}
 					}
@@ -69,26 +62,29 @@ public class Cave extends MapCreator {
 							continue;
 						}
 						
-						if (map.contains(x+offsetx, y+offsety) && data[offsety+y][offsetx+x] == StoneWall) {
+						if (map.get(offsetx+x, offsety+y) == DirtWall) {
 							n++;
 						}
 					}
 				}
 				
-				
 				if (m >= r1Cutoff || n <= r2Cutoff) {
 					tmp[y][x] = DirtWall;
 				} else {
-					tmp[y][x] = Unused;
+					tmp[y][x] = DirtFloor;
 				}
 				
 			}
 		}
 		
-		for(int y=0; y<h; y++) {
-			for(int x=0; x<w; x++) {
-				data[y][x] = tmp[y][x];
+		for(int y=0; y<height; y++) {
+			for(int x=0; x<width; x++) {
+				map.set(x, y, tmp[y][x]);
 			}
 		}
+	}
+
+	public void setFillprob(int fillprob) {
+		this.fillprob = fillprob;
 	}
 }

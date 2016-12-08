@@ -1,5 +1,7 @@
 package net.jmecn.map;
 
+import net.jmecn.map.creator.Cave;
+
 public class CaveTest {
 
 	public static void main(String[] args) {

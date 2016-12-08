@@ -5,15 +5,15 @@ final public class Tile {
 	private Tile() {
 	}
 
-	public final static int Unused = 0;
+	public final static int Unused = -1;
+	public final static int DirtFloor = 0;
 	public final static int DirtWall = 1;
-	public final static int DirtFloor = 2;
-	public final static int StoneWall = 3;
-	public final static int Corridor = 4;
-	public final static int Door = 5;
-	public final static int Upstairs = 6;
-	public final static int Downstairs = 7;
-	public final static int Chest = 8;
+	public final static int StoneWall = 2;
+	public final static int Corridor = 3;
+	public final static int Door = 4;
+	public final static int UpStairs = 5;
+	public final static int DownStairs = 6;
+	public final static int Chest = 7;
 
 	public final static char getChar(int value) {
 		switch (value) {
@@ -29,9 +29,9 @@ final public class Tile {
 			return '.';
 		case Door:
 			return '+';
-		case Upstairs:
+		case UpStairs:
 			return '<';
-		case Downstairs:
+		case DownStairs:
 			return '>';
 		case Chest:
 			return 'C';
