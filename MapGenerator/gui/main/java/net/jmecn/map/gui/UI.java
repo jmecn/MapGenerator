@@ -33,10 +33,14 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import net.jmecn.map.creator.Building;
 import net.jmecn.map.creator.Cave;
+import net.jmecn.map.creator.CaveSanto;
+import net.jmecn.map.creator.DungeonCell;
 import net.jmecn.map.creator.Dungeon;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
+import net.jmecn.map.creator.MazeWilson;
 
 /**
  * 程序主界面
@@ -89,29 +93,12 @@ public class UI extends JFrame {
 			pixel = 12;
 		}
 		
-		fillprob = 45;
-		Cave cave = new Cave(width, height);
-		cave.setFillprob(fillprob);
+		initMapCreators();
 		
-		maxFeatures = 100;
-		Dungeon dungeon = new Dungeon(width, height);
-		dungeon.setMaxFeatures(maxFeatures);
+		// use the first one
+		this.creator = mapCreators.get(0);
 		
-		roadSize = 1;
-		Maze maze = new Maze(width, height);
-		maze.setRoadSize(roadSize);
-		
-		mapCreators = new ArrayList<MapCreator>();
-		mapCreators.add(cave);
-		mapCreators.add(dungeon);
-		mapCreators.add(maze);
-		
-		
-		creator = cave;
-		creator.setSeed(seed);
-		creator.setUseSeed(!isRand);
-		
-		canvas = new Canvas(pixel);
+		this.canvas = new Canvas(pixel);
 
 		this.setTitle(res.getString("ui.title"));
 		this.setSize(1024, 768);
@@ -120,13 +107,45 @@ public class UI extends JFrame {
 		this.setContentPane(getContentPanel());
 		
 		// 生成洞穴
-		this.updateCave();
+		this.updateMap();
 
 		// 显示窗口
 		this.setVisible(true);
 
 	}
 
+	private void initMapCreators() {
+		fillprob = 45;
+		Cave cave = new Cave(width, height);
+		cave.setFillprob(fillprob);
+		
+		CaveSanto caveSanto = new CaveSanto(width, height);
+		
+		maxFeatures = 100;
+		Dungeon dungeon = new Dungeon(width, height);
+		dungeon.setMaxFeatures(maxFeatures);
+		
+		DungeonCell cell = new DungeonCell(width, height);
+		
+		roadSize = 1;
+		Maze maze = new Maze(width, height);
+		maze.setRoadSize(roadSize);
+		
+		MazeWilson wmaze = new MazeWilson(width, height);
+		
+		Building building = new Building(width, height);
+		
+		
+		mapCreators = new ArrayList<MapCreator>();
+		mapCreators.add(cave);
+		mapCreators.add(caveSanto);
+		mapCreators.add(dungeon);
+		mapCreators.add(cell);
+		mapCreators.add(maze);
+		mapCreators.add(wmaze);
+		mapCreators.add(building);
+		
+	}
 	/**
 	 * 主界面布局
 	 * 
@@ -147,10 +166,9 @@ public class UI extends JFrame {
 	}
 
 	/**
-	 * 刷新洞穴
+	 * 刷新地图
 	 */
-	private void updateCave() {
-		// 生成洞穴
+	private void updateMap() {
 		creator.resize(width, height);
 		if (creator instanceof Cave) {
 			((Cave) creator).setFillprob(fillprob);
@@ -228,16 +246,16 @@ public class UI extends JFrame {
 		toolBar.setAlignmentY(5);
 		
 		final JComboBox<String> combo = new JComboBox<String>();
-		combo.addItem(res.getString("creator.cave.name"));
-		combo.addItem(res.getString("creator.dungeon.name"));
-		combo.addItem(res.getString("creator.maze.name"));
+		for(int i=0; i<mapCreators.size(); i++) {
+			combo.addItem(mapCreators.get(i).getName());
+		}
 		
 		combo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				int index = combo.getSelectedIndex();
 				creator = mapCreators.get(index);
-				updateCave();
+				updateMap();
 				updateCanvas();
 			}
 		});
@@ -255,7 +273,7 @@ public class UI extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				height = rowSlider.getValue();
 				l1.setText(MessageFormat.format(res.getString("label.height"), height));
-				updateCave();
+				updateMap();
 			}
 		});
 		addTool(toolBar, rowSlider);
@@ -271,7 +289,7 @@ public class UI extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				width = colSlider.getValue();
 				l2.setText(MessageFormat.format(res.getString("label.width"), width));
-				updateCave();
+				updateMap();
 			}
 		});
 		addTool(toolBar, colSlider);
@@ -286,7 +304,7 @@ public class UI extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				fillprob = probSlider.getValue();
 				l3.setText(MessageFormat.format(res.getString("creator.cave.fillprob"), fillprob));
-				updateCave();
+				updateMap();
 			}
 		});
 		addTool(toolBar, probSlider);
@@ -333,7 +351,7 @@ public class UI extends JFrame {
 					seed = md5(seeds);
 				}
 				
-				updateCave();
+				updateMap();
 			}
 		});
 		addTool(toolBar, refreshBtn);

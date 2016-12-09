@@ -21,12 +21,12 @@ public class Dungeon extends MapCreator {
 	private int maxFeatures = 100;
 
 	public Dungeon(int width, int height) {
-		super(width, height);
+		super("creator.dungeon", width, height);
 	}
 
 	@Override
 	public void initialze() {
-		map.setCells(0, 0, width, height, Unused);
+		map.fill(Unused);
 	}
 
 	@Override
@@ -83,9 +83,6 @@ public class Dungeon extends MapCreator {
 			return false;
 
 		map.setCells(xStart, yStart, xEnd, yEnd, Corridor);
-
-		// std::cout << "Corridor: ( " << xStart << ", " << yStart << " ) to ( "
-		// << xEnd << ", " << yEnd << " )" << std::endl;
 
 		return true;
 	}

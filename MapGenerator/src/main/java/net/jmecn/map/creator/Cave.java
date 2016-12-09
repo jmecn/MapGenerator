@@ -9,7 +9,7 @@ public class Cave extends MapCreator {
 	final static private int r2Cutoff = 2;
 	
 	public Cave(int width, int height) {
-		super(width, height);
+		super("creator.cave", width, height);
 	}
 
 	protected int randPick() {

@@ -39,13 +39,39 @@ public class Map2D {
 			return -1;
 	}
 
+	/**
+	 * Fill the map with a tile
+	 * @param tile
+	 */
+	public void fill(int tile) {
+		for (int y = 0; y < height; y++)
+			for (int x = 0; x < width; x++)
+				map[y][x] = tile;
+	}
+	
+	/**
+	 * Build a boundary with given tile.
+	 * 
+	 * @param tile
+	 */
+	public void buildBoundary(int tile) {
+		for (int x = 0; x < width; x++) {
+			map[0][x] = tile;
+			map[height - 1][x] = tile;
+		}
+		for (int y = 0; y < height; y++) {
+			map[y][0] = tile;
+			map[y][width - 1] = tile;
+		}
+	}
+
 	public void setCells(int xStart, int yStart, int xEnd, int yEnd, int cellType) {
 		assert (xStart <= xEnd);
 		assert (yStart <= yEnd);
 
 		for (int y = yStart; y != yEnd + 1; ++y)
 			for (int x = xStart; x != xEnd + 1; ++x)
-				set(x, y, cellType);
+				map[y][x] = cellType;
 	}
 
 	public boolean isXInBounds(int x) {

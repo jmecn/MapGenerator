@@ -2,11 +2,19 @@ package net.jmecn.map.creator;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.ResourceBundle;
 
 import net.jmecn.map.Map2D;
 
+/**
+ * Base class for a tile map creator.
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public abstract class MapCreator {
 
+	protected String name;// Algorithm name
 	protected Map2D map;
 	protected int width;
 	protected int height;
@@ -16,6 +24,14 @@ public abstract class MapCreator {
 	private boolean useSeed = false;
 
 	public MapCreator(int width, int height) {
+		this.name = "Unknown algorithm#"+rand.nextInt();
+		this.map = new Map2D(width, height);
+		this.width = width;
+		this.height = height;
+	}
+	
+	public MapCreator(String name, int width, int height) {
+		setName(name);
 		this.map = new Map2D(width, height);
 		this.width = width;
 		this.height = height;
@@ -46,7 +62,7 @@ public abstract class MapCreator {
 		if (useSeed) {
 			rand = new Random(seed);
 		} else {
-			rand = new Random();
+			rand = new Random(System.currentTimeMillis());
 		}
 	}
 
@@ -80,6 +96,24 @@ public abstract class MapCreator {
 		return tmp;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		ResourceBundle res = ResourceBundle.getBundle("net.jmecn.map.creator.Name");
+		if (res != null) {
+			try {
+				this.name = res.getString(name);
+			} catch (Exception e) {
+				// no need to do anything
+				this.name = name;
+			}
+		} else {
+			this.name = name;
+		}
+	}
+	
 	public Map2D getMap() {
 		return map;
 	}
@@ -88,4 +122,8 @@ public abstract class MapCreator {
 
 	public abstract void create();
 
+	@Override
+	public String toString() {
+		return name;
+	}
 }

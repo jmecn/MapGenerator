@@ -51,16 +51,18 @@ public class Maze extends MapCreator {
 	private static int ROAD_SIZE = 3;
 	
 	public Maze(int width, int height) {
-		super(width * ROAD_SIZE + 1, height * ROAD_SIZE + 1);
+		super("creator.maze", width * ROAD_SIZE + 1, height * ROAD_SIZE + 1);
 		this.cellCols = width;
 		this.cellRows = height;
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		this.map = new Map2D(cellCols * ROAD_SIZE + 1, cellRows * ROAD_SIZE + 1);
+		this.map = new Map2D(width * ROAD_SIZE + 1, height * ROAD_SIZE + 1);
 		this.width = cellCols * ROAD_SIZE + 1;
 		this.height = cellRows * ROAD_SIZE + 1;
+		this.cellCols = width;
+		this.cellRows = height;
 		initRand();
 		initialze();
 	}
