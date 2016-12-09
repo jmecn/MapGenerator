@@ -156,9 +156,6 @@ public class UI extends JFrame {
 	 */
 	private void updateMap() {
 		creator.resize(width, height);
-		if (creator instanceof Cave) {
-			((Cave) creator).setFillprob(fillprob);
-		}
 		creator.setSeed(seed);
 		creator.setUseSeed(!isRand);
 		creator.initialze();
@@ -269,21 +266,6 @@ public class UI extends JFrame {
 		});
 		addTool(toolBar, colSlider);
 		
-		final JLabel l3 = new JLabel(MessageFormat.format(res.getString("creator.cave.fillprob"), fillprob));
-		addTool(toolBar, l3);
-		final JSlider probSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, fillprob);
-		probSlider.setMajorTickSpacing(10);
-		probSlider.setPaintLabels(true);
-		probSlider.setPaintTicks(true);
-		probSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				fillprob = probSlider.getValue();
-				l3.setText(MessageFormat.format(res.getString("creator.cave.fillprob"), fillprob));
-				updateMap();
-			}
-		});
-		addTool(toolBar, probSlider);
-
 		final JLabel l5 = new JLabel(MessageFormat.format(res.getString("label.pixel"), pixel));
 		addTool(toolBar, l5);
 
@@ -301,6 +283,8 @@ public class UI extends JFrame {
 		addTool(toolBar, pixelSlider);
 
 		final JTextField seedText = new JTextField(10);
+		seedText.setEnabled(!isRand);
+		
 		final JCheckBox isRandCheck = new JCheckBox(res.getString("checkbox.random"));
 		isRandCheck.setSelected(isRand);
 		isRandCheck.addChangeListener(new ChangeListener() {
