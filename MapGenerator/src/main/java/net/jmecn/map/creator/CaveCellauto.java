@@ -12,10 +12,10 @@ import static net.jmecn.map.Tile.*;
  */
 public class CaveCellauto extends MapCreator {
 
-	private int fillprob = 45;
+	private int fillprob = 40;
 	final static private int r1Cutoff = 5;
 	final static private int r2Cutoff = 2;
-	
+
 	public CaveCellauto(int width, int height) {
 		super("creator.cave.cellauto", width, height);
 	}
@@ -27,11 +27,11 @@ public class CaveCellauto extends MapCreator {
 			return DirtFloor;
 		}
 	}
-	
+
 	@Override
 	public void initialze() {
-		for(int y=0; y<height; y++) {
-			for(int x=0; x<width; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
 					map.set(x, y, DirtWall);
 				} else {
@@ -39,54 +39,115 @@ public class CaveCellauto extends MapCreator {
 				}
 			}
 		}
-		
+
 	}
 
 	@Override
 	public void create() {
-		for(int i=0; i<5; i++) {
-			generation();
+		do {
+			initialze();
+			for (int i = 0; i < 7; i++) {
+				generation(i);
+			}
+		} while(!(floodFill()));
+
+		// fill disconnected cave with wall
+		for (int y = 1; y < height-1; y++) {
+			for (int x = 1; x < width-1; x++) {
+				if (map.get(x, y) == Unused) {
+					map.set(x, y, DirtFloor);
+				} else if (map.get(x, y) == DirtFloor) {
+					map.set(x, y, DirtWall);
+				}
+			}
 		}
 	}
 
-	protected void generation() {
+	private int sum = 0;
+
+	private boolean floodFill() {
+		// get a random start point
+		int x, y;
+		do {
+			x = nextInt(width);
+			y = nextInt(height);
+		} while (map.get(x, y) != DirtFloor);
+
+		//
+		sum = 0;
+		floodFill8(x, y, Unused, DirtFloor);
+		
+		// at least 45% place are floor
+		double percent = 100.0 * sum/(width * height);
+		return percent >= 45.0;
+	}
+
+	private void floodFill8(int x, int y, int newTile, int oldTile) {
+
+		// skip boundary
+		if (x < 0 || x > width - 1 || y < 0 || y > height - 1 || map.get(x, y) != oldTile || map.get(x, y) == newTile) {
+			return;
+		}
+		map.set(x, y, newTile);
+		sum++;
+
+		floodFill8(x - 1, y - 1, newTile, oldTile);
+		floodFill8(x - 1, y, newTile, oldTile);
+		floodFill8(x - 1, y + 1, newTile, oldTile);
+		floodFill8(x, y - 1, newTile, oldTile);
+		floodFill8(x, y + 1, newTile, oldTile);
+		floodFill8(x + 1, y - 1, newTile, oldTile);
+		floodFill8(x + 1, y, newTile, oldTile);
+		floodFill8(x + 1, y + 1, newTile, oldTile);
+
+	}
+
+	protected void generation(int gen) {
 		int[][] tmp = copy();
-		for(int y=1; y<height-1; y++) {
-			for(int x=1; x<width-1; x++) {
-				
+		for (int y = 1; y < height - 1; y++) {
+			for (int x = 1; x < width - 1; x++) {
+
 				int m = 0;
-				for(int offsety=-1; offsety<=1; offsety++) {
-					for(int offsetx=-1; offsetx<=1; offsetx++) {
-						if (map.get(offsetx+x, offsety+y) == DirtWall) {
+				for (int offsety = -1; offsety <= 1; offsety++) {
+					for (int offsetx = -1; offsetx <= 1; offsetx++) {
+						if (map.get(offsetx + x, offsety + y) == DirtWall) {
 							m++;
 						}
 					}
 				}
-				
+
 				int n = 0;
-				for(int offsety=-2; offsety<=2; offsety++) {
-					for(int offsetx=-2; offsetx<=2; offsetx++) {
+				for (int offsety = -2; offsety <= 2; offsety++) {
+					for (int offsetx = -2; offsetx <= 2; offsetx++) {
 						if (Math.abs(offsetx) == 2 && Math.abs(offsety) == 2) {
 							continue;
 						}
-						
-						if (map.get(offsetx+x, offsety+y) == DirtWall) {
+
+						if (map.get(offsetx + x, offsety + y) == DirtWall) {
 							n++;
 						}
 					}
 				}
-				
-				if (m >= r1Cutoff || n <= r2Cutoff) {
-					tmp[y][x] = DirtWall;
+
+				if (gen < 4) {
+					if (m >= r1Cutoff || n <= r2Cutoff) {
+						tmp[y][x] = DirtWall;
+					} else {
+						tmp[y][x] = DirtFloor;
+					}
 				} else {
-					tmp[y][x] = DirtFloor;
+					if (m >= r1Cutoff) {
+						tmp[y][x] = DirtWall;
+					} else {
+						tmp[y][x] = DirtFloor;
+					}
 				}
-				
+
 			}
 		}
-		
-		for(int y=0; y<height; y++) {
-			for(int x=0; x<width; x++) {
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				map.set(x, y, tmp[y][x]);
 			}
 		}
@@ -95,7 +156,7 @@ public class CaveCellauto extends MapCreator {
 	public void setFillprob(int fillprob) {
 		this.fillprob = fillprob;
 	}
-	
+
 	public static void main(String[] args) {
 		CaveCellauto cave = new CaveCellauto(30, 30);
 		cave.setSeed(1654987414656544l);

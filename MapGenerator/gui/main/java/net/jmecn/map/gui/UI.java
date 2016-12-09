@@ -61,9 +61,6 @@ public class UI extends JFrame {
 	// Maze only
 	private int roadSize;
 	
-	// Cave only
-	private int fillprob;
-
 	// Dungeon only
 	private int maxFeatures;
 	
@@ -107,9 +104,7 @@ public class UI extends JFrame {
 	}
 
 	private void initMapCreators() {
-		fillprob = 45;
 		CaveCellauto cellauto = new CaveCellauto(width, height);
-		cellauto.setFillprob(fillprob);
 		
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
