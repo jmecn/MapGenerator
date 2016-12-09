@@ -15,9 +15,9 @@ import static net.jmecn.map.Direction.*;
  * @author yanmaoyuan
  *
  */
-public class Dungeon extends MapCreator {
+public class DungeonTyrant extends MapCreator {
 
-	static Logger logger = Logger.getLogger(Dungeon.class.getName());
+	static Logger logger = Logger.getLogger(DungeonTyrant.class.getName());
 
 	final static int ChanceRoom = 50; // corridorChance = 100 - roomChance
 	static final int minRoomSize = 3;
@@ -28,7 +28,7 @@ public class Dungeon extends MapCreator {
 
 	private int maxFeatures = 100;
 
-	public Dungeon(int width, int height) {
+	public DungeonTyrant(int width, int height) {
 		super("creator.dungeon.tyrant", width, height);
 	}
 
@@ -222,7 +222,7 @@ public class Dungeon extends MapCreator {
 	}
 
 	public static void main(String[] args) {
-		Dungeon dungeon = new Dungeon(79, 24);
+		DungeonTyrant dungeon = new DungeonTyrant(79, 24);
 		dungeon.initialze();
 		dungeon.create();
 		dungeon.getMap().printMapChars();

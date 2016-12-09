@@ -37,7 +37,7 @@ import net.jmecn.map.creator.Building;
 import net.jmecn.map.creator.Cave;
 import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
-import net.jmecn.map.creator.Dungeon;
+import net.jmecn.map.creator.DungeonTyrant;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
 import net.jmecn.map.creator.MazeWilson;
@@ -113,7 +113,7 @@ public class UI extends JFrame {
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
 		maxFeatures = 100;
-		Dungeon dungeon = new Dungeon(width, height);
+		DungeonTyrant dungeon = new DungeonTyrant(width, height);
 		dungeon.setMaxFeatures(maxFeatures);
 		
 		DungeonCell cell = new DungeonCell(width, height);
