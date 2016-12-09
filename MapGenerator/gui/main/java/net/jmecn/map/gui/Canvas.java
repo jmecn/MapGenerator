@@ -13,12 +13,12 @@ import net.jmecn.map.Map2D;
 import net.jmecn.map.Tile;
 
 /**
- * 画板
+ * The renderer
  * @author yan
  *
  */
 public class Canvas extends JPanel {
-	private BufferedImage image;// 图像缓冲区
+	private BufferedImage image;
 
 	private int SIZE = 12;
 	
@@ -26,13 +26,9 @@ public class Canvas extends JPanel {
 	private Color floorColor = new Color(255, 242, 182);
 	
 	public Canvas() {
-		this(12);// 默认12像素
+		this(12);
 	}
 	
-	/**
-	 * 根据用户设置的像素值初始化画板。
-	 * @param px
-	 */
 	public Canvas(int px) {
 		setPixel(px);
 		
@@ -46,7 +42,6 @@ public class Canvas extends JPanel {
 				return;
 			}
 			
-			// 设置方块坐标
 			x -= 5;
 			y -= 5;
 			x /= SIZE;
@@ -61,8 +56,8 @@ public class Canvas extends JPanel {
 			}
 		}
 		
-		private boolean lPressed = false;// 鼠标左键
-		private boolean rPressed = false;// 鼠标右键
+		private boolean lPressed = false;
+		private boolean rPressed = false;
 		
 		public void mousePressed(MouseEvent e) {
 			switch (e.getButton()) {
@@ -95,18 +90,11 @@ public class Canvas extends JPanel {
 			}
 		}
 	};
-	/**
-	 * 设置像素宽度
-	 * 至少7 px
-	 * @param px
-	 */
+	
 	public void setPixel(int px) {
 		if (px < 7) px = 7;
 		SIZE = px;
 	}
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3767183299577116646L;
 
 	int[][] map;
@@ -116,11 +104,6 @@ public class Canvas extends JPanel {
 	int width = 0;
 	int height = 0;
 
-	/**
-	 * 设置迷宫地图
-	 * 
-	 * @param map
-	 */
 	public void setMap(Map2D map) {
 		this.map = map.getMap();
 		this.row = map.getHeight();
@@ -135,24 +118,17 @@ public class Canvas extends JPanel {
 		this.setPreferredSize(new Dimension(width, height));
 	}
 
-	/**
-	 * 将迷宫地图画到缓冲区中。
-	 */
 	private void drawImage() {
-		// 清屏
 		image.flush();
 
 		Graphics g = image.getGraphics();
 		
-		// 填充底色
 		g.setColor(Color.white);
 		g.fillRect(0, 0, width, height);
 		
-		// 循环绘制界面
 		for (int y = 0; y < row; y++) {
 			g.setColor(wallColor);
 			for (int x = 0; x < col; x++) {
-				// 绘制界面方块
 				switch (map[y][x]) {
 				case Tile.Unused: {
 					// skip it
@@ -191,93 +167,44 @@ public class Canvas extends JPanel {
 		}
 	}
 
-	/**
-	 * 绘制单个方块
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawDirtFloor(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(floorColor);
 		g.fillRect(x, y , SIZE, SIZE);
 	}
 	
-	/**
-	 * 绘制单个方块
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawDirtWall(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(wallColor);
 		g.fillRect(x, y , SIZE, SIZE);
 	}
 
-	/**
-	 * 绘制单个方块
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawStoneWall(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(new Color(0xEE, 0xEE, 0xFF));
 		g.fillRect(x + 1, y + 1 , SIZE - 2, SIZE - 2);
 		
-		// 设置线段颜色
 		g.setColor(Color.BLACK);
-		// 绘制线段
+		
 		g.drawLine(x + 1, y, x + SIZE - 2, y);
 		g.drawLine(x + 1, y + SIZE - 1, x + SIZE - 2, y + SIZE - 1);
 		g.drawLine(x, y + 1, x, y + SIZE - 2);
 		g.drawLine(x + SIZE - 1, y + 1, x + SIZE - 1, y + SIZE - 2);
-		// 绘制立体的线段
+		
 		g.drawLine(x + 2, y + SIZE - 3, x + SIZE - 3, y + SIZE - 3);
 		g.drawLine(x + SIZE - 3, y + 2, x + SIZE - 3, y + SIZE - 3);
 	}
 
-	/**
-	 * 绘制门
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawDoor(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(Color.orange);
 		g.fillRect(x + 1, y + 1 , SIZE - 2, SIZE - 2);
 		g.setColor(Color.darkGray);
@@ -286,62 +213,26 @@ public class Canvas extends JPanel {
 		
 	}
 	
-	/**
-	 * 绘制路径点
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawCorridor(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(Color.GRAY);
 		g.fillRect(x+2, y+2, SIZE-5, SIZE-5);
 	}
 	
-	/**
-	 * 绘制门
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawUpStairs(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(Color.green);
 		g.fillRect(x + 2, y + 2 , SIZE - 5, SIZE - 5);
 	}
 	
-	/**
-	 * 绘制门
-	 * 
-	 * @param g
-	 *            画笔
-	 * @param posX
-	 *            横坐标
-	 * @param posY
-	 *            纵坐标
-	 */
 	private void drawDownStairs(Graphics g, int posX, int posY) {
-		// 设置方块坐标
 		int x = 5 + posX * SIZE;
 		int y = 5 + posY * SIZE;
 
-		// 绘制方块底色
 		g.setColor(Color.RED);
 		g.fillRect(x + 2, y + 2 , SIZE - 5, SIZE - 5);
 	}

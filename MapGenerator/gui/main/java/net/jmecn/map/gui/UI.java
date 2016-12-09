@@ -42,12 +42,6 @@ import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
 import net.jmecn.map.creator.MazeWilson;
 
-/**
- * 程序主界面
- * 
- * @author yan
- * 
- */
 public class UI extends JFrame {
 	/**
 	 * 
@@ -72,7 +66,6 @@ public class UI extends JFrame {
 	// Dungeon only
 	private int maxFeatures;
 	
-	// 绘图板
 	private int pixel;
 	private Canvas canvas;
 
@@ -106,10 +99,8 @@ public class UI extends JFrame {
 		this.setJMenuBar(getJMenuBar());
 		this.setContentPane(getContentPanel());
 		
-		// 生成洞穴
 		this.updateMap();
 
-		// 显示窗口
 		this.setVisible(true);
 
 	}
@@ -146,27 +137,22 @@ public class UI extends JFrame {
 		mapCreators.add(building);
 		
 	}
-	/**
-	 * 主界面布局
-	 * 
-	 * @return
-	 */
 	private JPanel getContentPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 
-		// 画板
+		// the renderer
 		JScrollPane pane = new JScrollPane();
 		pane.setViewportView(canvas);
 		panel.add(pane, BorderLayout.CENTER);
 
-		// 工具条
+		// the toolbar
 		panel.add(getJToolBar(), BorderLayout.EAST);
 
 		return panel;
 	}
 
 	/**
-	 * 刷新地图
+	 * update map
 	 */
 	private void updateMap() {
 		creator.resize(width, height);
@@ -178,7 +164,6 @@ public class UI extends JFrame {
 		creator.initialze();
 		creator.create();
 
-		// 生成图形
 		updateCanvas();
 	}
 
@@ -186,13 +171,9 @@ public class UI extends JFrame {
 		canvas.setPixel(pixel);
 		canvas.setMap(creator.getMap());
 		
-		// 刷新
 		canvas.updateUI();
 	}
 	
-	/**
-	 * 菜单
-	 */
 	public JMenuBar getJMenuBar() {
 		JMenuBar bar = new JMenuBar();
 
@@ -234,18 +215,13 @@ public class UI extends JFrame {
 		return bar;
 	}
 
-	/**
-	 * 工具条
-	 * 
-	 * @return
-	 */
 	public JToolBar getJToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setOrientation(JToolBar.VERTICAL);
 		toolBar.setAlignmentY(5);
 		
-		final JComboBox<String> combo = new JComboBox<String>();
+		final JComboBox combo = new JComboBox();
 		for(int i=0; i<mapCreators.size(); i++) {
 			combo.addItem(mapCreators.get(i).getName());
 		}
@@ -256,7 +232,6 @@ public class UI extends JFrame {
 				int index = combo.getSelectedIndex();
 				creator = mapCreators.get(index);
 				updateMap();
-				updateCanvas();
 			}
 		});
 
@@ -320,7 +295,6 @@ public class UI extends JFrame {
 			public void stateChanged(ChangeEvent e) {
 				pixel = pixelSlider.getValue();
 				l5.setText(MessageFormat.format(res.getString("label.pixel"), pixel));
-				
 				updateCanvas();
 			}
 		});
@@ -359,10 +333,6 @@ public class UI extends JFrame {
 		return toolBar;
 	}
 
-	/**
-	 * @param toolBar
-	 * @param comp
-	 */
 	private void addTool(JToolBar toolBar, Component comp) {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.add(comp);

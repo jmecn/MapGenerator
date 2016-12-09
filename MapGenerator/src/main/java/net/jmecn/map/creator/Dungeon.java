@@ -37,7 +37,6 @@ public class Dungeon extends MapCreator {
 
 		for (int features = 1; features != maxFeatures; ++features) {
 			if (!makeFeature()) {
-				logger.log(Level.WARNING, "Unable to place more features (placed " + features + ").");
 				break;
 			}
 		}
