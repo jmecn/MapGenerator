@@ -10,13 +10,13 @@ import static net.jmecn.map.Tile.*;
  * @author yanmaoyuan
  *
  */
-public class Cave extends MapCreator {
+public class CaveCellauto extends MapCreator {
 
 	private int fillprob = 45;
 	final static private int r1Cutoff = 5;
 	final static private int r2Cutoff = 2;
 	
-	public Cave(int width, int height) {
+	public CaveCellauto(int width, int height) {
 		super("creator.cave.cellauto", width, height);
 	}
 
@@ -97,7 +97,7 @@ public class Cave extends MapCreator {
 	}
 	
 	public static void main(String[] args) {
-		Cave cave = new Cave(30, 30);
+		CaveCellauto cave = new CaveCellauto(30, 30);
 		cave.setSeed(1654987414656544l);
 		cave.setUseSeed(true);
 		cave.initialze();

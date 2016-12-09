@@ -34,9 +34,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import net.jmecn.map.creator.Building;
-import net.jmecn.map.creator.Cave;
+import net.jmecn.map.creator.CaveCellauto;
 import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
+import net.jmecn.map.creator.DungeonNickgravelyn;
 import net.jmecn.map.creator.DungeonTyrant;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
@@ -107,15 +108,16 @@ public class UI extends JFrame {
 
 	private void initMapCreators() {
 		fillprob = 45;
-		Cave cave = new Cave(width, height);
-		cave.setFillprob(fillprob);
+		CaveCellauto cellauto = new CaveCellauto(width, height);
+		cellauto.setFillprob(fillprob);
 		
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
 		maxFeatures = 100;
-		DungeonTyrant dungeon = new DungeonTyrant(width, height);
-		dungeon.setMaxFeatures(maxFeatures);
+		DungeonTyrant tyrant = new DungeonTyrant(width, height);
+		tyrant.setMaxFeatures(maxFeatures);
 		
+		DungeonNickgravelyn nickgravelyn = new DungeonNickgravelyn(width, height);
 		DungeonCell cell = new DungeonCell(width, height);
 		
 		roadSize = 1;
@@ -128,9 +130,10 @@ public class UI extends JFrame {
 		
 		
 		mapCreators = new ArrayList<MapCreator>();
-		mapCreators.add(cave);
+		mapCreators.add(cellauto);
 		mapCreators.add(caveSanto);
-		mapCreators.add(dungeon);
+		mapCreators.add(tyrant);
+		mapCreators.add(nickgravelyn);
 		mapCreators.add(cell);
 		mapCreators.add(maze);
 		mapCreators.add(wmaze);
