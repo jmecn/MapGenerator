@@ -214,4 +214,11 @@ public class Dungeon extends MapCreator {
 		return false;
 	}
 
+	public static void main(String[] args) {
+		Dungeon dungeon = new Dungeon(79, 24);
+		dungeon.initialze();
+		dungeon.create();
+		dungeon.getMap().printMapChars();
+		dungeon.getMap().printMapArray();
+	}
 }
