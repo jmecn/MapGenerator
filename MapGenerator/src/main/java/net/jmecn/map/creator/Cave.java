@@ -2,6 +2,14 @@ package net.jmecn.map.creator;
 
 import static net.jmecn.map.Tile.*;
 
+/**
+ * https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
+ * 
+ * http://pixelenvy.ca/wa/ca_cave.html
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public class Cave extends MapCreator {
 
 	private int fillprob = 45;
@@ -9,7 +17,7 @@ public class Cave extends MapCreator {
 	final static private int r2Cutoff = 2;
 	
 	public Cave(int width, int height) {
-		super("creator.cave", width, height);
+		super("creator.cave.cellauto", width, height);
 	}
 
 	protected int randPick() {

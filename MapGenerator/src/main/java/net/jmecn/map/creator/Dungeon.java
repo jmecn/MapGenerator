@@ -7,6 +7,14 @@ import java.util.logging.Logger;
 
 import static net.jmecn.map.Direction.*;
 
+/**
+ * Tyrant's dungeon generate algorithm
+ * 
+ * https://sourceforge.net/projects/tyrant/
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public class Dungeon extends MapCreator {
 
 	static Logger logger = Logger.getLogger(Dungeon.class.getName());
@@ -21,7 +29,7 @@ public class Dungeon extends MapCreator {
 	private int maxFeatures = 100;
 
 	public Dungeon(int width, int height) {
-		super("creator.dungeon", width, height);
+		super("creator.dungeon.tyrant", width, height);
 	}
 
 	@Override
