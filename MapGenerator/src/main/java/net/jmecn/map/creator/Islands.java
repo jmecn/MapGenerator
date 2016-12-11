@@ -10,21 +10,20 @@ import static net.jmecn.map.Tile.*;
  * @author yanmaoyuan
  *
  */
-public class CaveCellauto extends MapCreator {
+public class Islands extends MapCreator {
 
-	private int fillprob = 40;
+	private int fillprob = 45;
 	final static private int r1Cutoff = 5;
-	final static private int r2Cutoff = 2;
 
-	public CaveCellauto(int width, int height) {
-		super("creator.cave.cellauto", width, height);
+	public Islands(int width, int height) {
+		super("creator.islands.cellauto", width, height);
 	}
 
 	protected int randPick() {
 		if (rand.nextInt(100) < fillprob) {
-			return Wall;
-		} else {
 			return Floor;
+		} else {
+			return Water;
 		}
 	}
 
@@ -33,7 +32,7 @@ public class CaveCellauto extends MapCreator {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
-					map.set(x, y, Wall);
+					map.set(x, y, Floor);
 				} else {
 					map.set(x, y, randPick());
 				}
@@ -46,7 +45,7 @@ public class CaveCellauto extends MapCreator {
 	public void create() {
 		do {
 			initialze();
-			for (int i = 0; i < 7; i++) {
+			for (int i = 0; i < 5; i++) {
 				generation(i);
 			}
 		} while(!(floodFill()));
@@ -54,10 +53,10 @@ public class CaveCellauto extends MapCreator {
 		// fill disconnected cave with wall
 		for (int y = 1; y < height-1; y++) {
 			for (int x = 1; x < width-1; x++) {
-				if (map.get(x, y) == Unused) {
+				if (map.get(x, y) == Floor) {
+					map.set(x, y, Water);
+				} else if (map.get(x, y) == Stone) {
 					map.set(x, y, Floor);
-				} else if (map.get(x, y) == Floor) {
-					map.set(x, y, Wall);
 				}
 			}
 		}
@@ -75,11 +74,12 @@ public class CaveCellauto extends MapCreator {
 
 		//
 		sum = 0;
-		floodFill8(x, y, Unused, Floor);
+		floodFill8(x, y, Stone, Floor);
 		
 		// at least 45% place are floor
 		double percent = 100.0 * sum/(width * height);
-		return percent >= 45.0;
+		System.out.println(percent);
+		return percent >= 50.0;
 	}
 
 	private void floodFill8(int x, int y, int newTile, int oldTile) {
@@ -110,37 +110,16 @@ public class CaveCellauto extends MapCreator {
 				int m = 0;
 				for (int offsety = -1; offsety <= 1; offsety++) {
 					for (int offsetx = -1; offsetx <= 1; offsetx++) {
-						if (map.get(offsetx + x, offsety + y) == Wall) {
+						if (map.get(offsetx + x, offsety + y) == Water) {
 							m++;
 						}
 					}
 				}
 
-				int n = 0;
-				for (int offsety = -2; offsety <= 2; offsety++) {
-					for (int offsetx = -2; offsetx <= 2; offsetx++) {
-						if (Math.abs(offsetx) == 2 && Math.abs(offsety) == 2) {
-							continue;
-						}
-
-						if (map.get(offsetx + x, offsety + y) == Wall) {
-							n++;
-						}
-					}
-				}
-
-				if (gen < 4) {
-					if (m >= r1Cutoff || n <= r2Cutoff) {
-						tmp[y][x] = Wall;
-					} else {
-						tmp[y][x] = Floor;
-					}
+				if (m >= r1Cutoff) {
+					tmp[y][x] = Floor;
 				} else {
-					if (m >= r1Cutoff) {
-						tmp[y][x] = Wall;
-					} else {
-						tmp[y][x] = Floor;
-					}
+					tmp[y][x] = Water;
 				}
 
 			}
@@ -158,9 +137,9 @@ public class CaveCellauto extends MapCreator {
 	}
 
 	public static void main(String[] args) {
-		CaveCellauto cave = new CaveCellauto(30, 30);
+		Islands cave = new Islands(50, 50);
 		cave.setSeed(1654987414656544l);
-		cave.setUseSeed(true);
+		cave.setUseSeed(false);
 		cave.initialze();
 		cave.create();
 		cave.getMap().printMapChars();

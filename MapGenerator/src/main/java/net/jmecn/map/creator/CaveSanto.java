@@ -31,7 +31,7 @@ public class CaveSanto extends MapCreator {
 
 	@Override
 	public void initialze() {
-		map.fill(DirtWall);
+		map.fill(Wall);
 	}
 
 	@Override
@@ -147,7 +147,7 @@ public class CaveSanto extends MapCreator {
 
     private void copyListToArray(List<Point> dungeonList){
         for(Point pos : dungeonList){
-        	map.set(pos.x, pos.y, DirtFloor);
+        	map.set(pos.x, pos.y, Floor);
         }
     }
 

@@ -63,11 +63,11 @@ public class Canvas extends JPanel {
 			switch (e.getButton()) {
 			case MouseEvent.BUTTON1 : // left
 				lPressed = true;
-				changeMap(e.getX(), e.getY(), Tile.DirtWall);
+				changeMap(e.getX(), e.getY(), Tile.Wall);
 				break;
 			case MouseEvent.BUTTON3 : // right
 				rPressed = true;
-				changeMap(e.getX(), e.getY(), Tile.DirtFloor);
+				changeMap(e.getX(), e.getY(), Tile.Floor);
 				break;
 			}
 		}
@@ -84,9 +84,9 @@ public class Canvas extends JPanel {
 		public void mouseDragged(MouseEvent e) {
 			
 			if (lPressed) {
-				changeMap(e.getX(), e.getY(), Tile.DirtWall);
+				changeMap(e.getX(), e.getY(), Tile.Wall);
 			} else if (rPressed) {
-				changeMap(e.getX(), e.getY(), Tile.DirtFloor);
+				changeMap(e.getX(), e.getY(), Tile.Floor);
 			}
 		}
 	};
@@ -134,15 +134,15 @@ public class Canvas extends JPanel {
 					// skip it
 					break;
 				}
-				case Tile.DirtFloor: {
+				case Tile.Floor: {
 					drawDirtFloor(g, x, y);
 					break;
 				}
-				case Tile.DirtWall: {
-					drawDirtWall(g, x, y);
+				case Tile.Wall: {
+					drawWall(g, x, y);
 					break;
 				}
-				case Tile.StoneWall: {
+				case Tile.Stone: {
 					drawStoneWall(g, x, y);
 					break;
 				}
@@ -162,25 +162,21 @@ public class Canvas extends JPanel {
 					drawDownStairs(g, x, y);
 					break;
 				}
+				case Tile.Water: {
+					drawWater(g, x, y);
+					break;
+				}
 				}
 			}
 		}
 	}
 
 	private void drawDirtFloor(Graphics g, int posX, int posY) {
-		int x = 5 + posX * SIZE;
-		int y = 5 + posY * SIZE;
-
-		g.setColor(floorColor);
-		g.fillRect(x, y , SIZE, SIZE);
+		drawBox(g, posX, posY, floorColor);
 	}
 	
-	private void drawDirtWall(Graphics g, int posX, int posY) {
-		int x = 5 + posX * SIZE;
-		int y = 5 + posY * SIZE;
-
-		g.setColor(wallColor);
-		g.fillRect(x, y , SIZE, SIZE);
+	private void drawWall(Graphics g, int posX, int posY) {
+		drawBox(g, posX, posY, wallColor);
 	}
 
 	private void drawStoneWall(Graphics g, int posX, int posY) {
@@ -218,7 +214,7 @@ public class Canvas extends JPanel {
 		int y = 5 + posY * SIZE;
 
 		g.setColor(Color.GRAY);
-		g.fillRect(x+2, y+2, SIZE-5, SIZE-5);
+		g.drawRect(x+1, y+1, SIZE-2, SIZE-2);
 	}
 	
 	private void drawUpStairs(Graphics g, int posX, int posY) {
@@ -226,7 +222,7 @@ public class Canvas extends JPanel {
 		int y = 5 + posY * SIZE;
 
 		g.setColor(Color.green);
-		g.fillRect(x + 2, y + 2 , SIZE - 5, SIZE - 5);
+		g.fillRect(x + 1, y + 1 , SIZE - 2, SIZE - 2);
 	}
 	
 	private void drawDownStairs(Graphics g, int posX, int posY) {
@@ -234,7 +230,19 @@ public class Canvas extends JPanel {
 		int y = 5 + posY * SIZE;
 
 		g.setColor(Color.RED);
-		g.fillRect(x + 2, y + 2 , SIZE - 5, SIZE - 5);
+		g.fillRect(x + 1, y + 1 , SIZE - 2, SIZE - 2);
+	}
+	
+	private void drawWater(Graphics g, int posX, int posY) {
+		drawBox(g, posX, posY, Color.BLUE);
+	}
+	
+	private void drawBox(Graphics g, int posX, int posY, Color color) {
+		int x = 5 + posX * SIZE;
+		int y = 5 + posY * SIZE;
+		
+		g.setColor(color);
+		g.fillRect(x, y , SIZE, SIZE);
 	}
 	
 	@Override

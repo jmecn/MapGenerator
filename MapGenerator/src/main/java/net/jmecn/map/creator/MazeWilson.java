@@ -24,13 +24,13 @@ public class MazeWilson extends MapCreator {
 
 	@Override
 	public void initialze() {
-		map.fill(DirtWall);
+		map.fill(Wall);
 	}
 
 	@Override
 	public void create() {
 		// first spot on maze. walker seeks established maze tiles
-		map.set(1, height - 2, DirtFloor);
+		map.set(1, height - 2, Floor);
 
 		// the first start point.
 		Point nextStart = new Point(3, height - 2);
@@ -44,8 +44,8 @@ public class MazeWilson extends MapCreator {
 		ArrayList<Point> trail = new ArrayList<Point>();
 		ArrayList<Integer> moveLog = new ArrayList<Integer>(); // should always
 
-		trail.add(new Point(x, y, StoneWall));
-		map.set(x, y, StoneWall);
+		trail.add(new Point(x, y, Stone));
+		map.set(x, y, Stone);
 
 		moveLog.add(UnknownDir);// placeholder that hopefully won't break anything
 		while (true) {
@@ -74,39 +74,39 @@ public class MazeWilson extends MapCreator {
 				if (move == South)
 					y++;
 
-				trail.add(new Point(x, y, StoneWall));// add the new piece of the trail
-				map.set(x, y, StoneWall);// change its tile for collision purposes
+				trail.add(new Point(x, y, Stone));// add the new piece of the trail
+				map.set(x, y, Stone);// change its tile for collision purposes
 
 				// look for loops and erase back if found
 				boolean looped = false;
-				if (map.get(x + 1, y) == StoneWall && move != West) {
+				if (map.get(x + 1, y) == Stone && move != West) {
 					x++;
 					looped = true;
-				} else if (map.get(x - 1, y) == StoneWall && move != East) {
+				} else if (map.get(x - 1, y) == Stone && move != East) {
 					x--;
 					looped = true;
-				} else if (map.get(x, y + 1) == StoneWall && move != North) {
+				} else if (map.get(x, y + 1) == Stone && move != North) {
 					y++;
 					looped = true;
-				} else if (map.get(x, y - 1) == StoneWall && move != South) {
+				} else if (map.get(x, y - 1) == Stone && move != South) {
 					y--;
 					looped = true;
-				} else if (map.get(x - 1, y - 1) == StoneWall
+				} else if (map.get(x - 1, y - 1) == Stone
 						&& map.get(x - 1, y - 1) != trail.get(trail.size() - 3).tile) {
 					x--;
 					y--;
 					looped = true;
-				} else if (map.get(x + 1, y - 1) == StoneWall
+				} else if (map.get(x + 1, y - 1) == Stone
 						&& map.get(x + 1, y - 1) != trail.get(trail.size() - 3).tile) {
 					x++;
 					y--;
 					looped = true;
-				} else if (map.get(x - 1, y + 1) == StoneWall
+				} else if (map.get(x - 1, y + 1) == Stone
 						&& map.get(x - 1, y + 1) != trail.get(trail.size() - 3).tile) {
 					x--;
 					y++;
 					looped = true;
-				} else if (map.get(x + 1, y + 1) == StoneWall
+				} else if (map.get(x + 1, y + 1) == Stone
 						&& map.get(x + 1, y + 1) != trail.get(trail.size() - 3).tile) {
 					x++;
 					y++;
@@ -118,7 +118,7 @@ public class MazeWilson extends MapCreator {
 
 					for (int j = retrace + 1; j < trail.size(); j++) {
 						Point p = trail.get(j);
-						map.set(p.x, p.y, DirtWall);
+						map.set(p.x, p.y, Wall);
 					}
 
 					trail.subList(retrace + 1, trail.size()).clear();
@@ -128,10 +128,10 @@ public class MazeWilson extends MapCreator {
 				}
 
 				// look for connections and commit if found
-				if (i == 0 && (map.get(x - 1, y) == DirtFloor || map.get(x + 1, y) == DirtFloor
-						|| map.get(x, y - 1) == DirtFloor || map.get(x, y + 1) == DirtFloor)) {
+				if (i == 0 && (map.get(x - 1, y) == Floor || map.get(x + 1, y) == Floor
+						|| map.get(x, y - 1) == Floor || map.get(x, y + 1) == Floor)) {
 					for (Point p : trail) {
-						map.set(p.x, p.y, DirtFloor);
+						map.set(p.x, p.y, Floor);
 					}
 					return;
 				}
@@ -161,7 +161,7 @@ public class MazeWilson extends MapCreator {
 					for (int offsetX = -1; offsetX <= 1; offsetX++) {
 						if (offsetX == 0 && offsetY == 0)
 							continue;
-						if (map.get(x + offsetX, y + offsetY) == DirtWall) {
+						if (map.get(x + offsetX, y + offsetY) == Wall) {
 							adjacentBlackCounter++;
 						}
 					}

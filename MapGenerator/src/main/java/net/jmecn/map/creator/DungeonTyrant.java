@@ -130,8 +130,8 @@ public class DungeonTyrant extends MapCreator {
 		if (!map.isAreaUnused(xStart, yStart, xEnd, yEnd))
 			return false;
 
-		map.setCells(xStart, yStart, xEnd, yEnd, DirtWall);
-		map.setCells(xStart + 1, yStart + 1, xEnd - 1, yEnd - 1, DirtFloor);
+		map.setCells(xStart, yStart, xEnd, yEnd, Wall);
+		map.setCells(xStart + 1, yStart + 1, xEnd - 1, yEnd - 1, Floor);
 
 		return true;
 	}
@@ -145,7 +145,7 @@ public class DungeonTyrant extends MapCreator {
 				map.set(x, y, Door);
 
 				// Remove wall next to the door.
-				map.set(x + xmod, y + ymod, DirtFloor);
+				map.set(x + xmod, y + ymod, Floor);
 
 				return true;
 			}
@@ -175,22 +175,22 @@ public class DungeonTyrant extends MapCreator {
 			int x = nextInt(1, width - 2);
 			int y = nextInt(1, height - 2);
 
-			if (map.get(x, y) != DirtWall && map.get(x, y) != Corridor)
+			if (map.get(x, y) != Wall && map.get(x, y) != Corridor)
 				continue;
 
 			if (map.isAdjacent(x, y, Door))
 				continue;
 
-			if (map.get(x, y + 1) == DirtFloor || map.get(x, y + 1) == Corridor) {
+			if (map.get(x, y + 1) == Floor || map.get(x, y + 1) == Corridor) {
 				if (makeFeature(x, y, 0, -1, North))
 					return true;
-			} else if (map.get(x - 1, y) == DirtFloor || map.get(x - 1, y) == Corridor) {
+			} else if (map.get(x - 1, y) == Floor || map.get(x - 1, y) == Corridor) {
 				if (makeFeature(x, y, 1, 0, East))
 					return true;
-			} else if (map.get(x, y - 1) == DirtFloor || map.get(x, y - 1) == Corridor) {
+			} else if (map.get(x, y - 1) == Floor || map.get(x, y - 1) == Corridor) {
 				if (makeFeature(x, y, 0, 1, South))
 					return true;
-			} else if (map.get(x + 1, y) == DirtFloor || map.get(x + 1, y) == Corridor) {
+			} else if (map.get(x + 1, y) == Floor || map.get(x + 1, y) == Corridor) {
 				if (makeFeature(x, y, -1, 0, West))
 					return true;
 			}
@@ -207,7 +207,7 @@ public class DungeonTyrant extends MapCreator {
 			int x = nextInt(1, width - 2);
 			int y = nextInt(1, height - 2);
 
-			if (!map.isAdjacent(x, y, DirtFloor) && !map.isAdjacent(x, y, Corridor))
+			if (!map.isAdjacent(x, y, Floor) && !map.isAdjacent(x, y, Corridor))
 				continue;
 
 			if (map.isAdjacent(x, y, Door))

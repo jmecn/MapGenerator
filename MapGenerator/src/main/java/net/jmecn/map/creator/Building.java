@@ -23,7 +23,7 @@ public class Building extends MapCreator {
 
 	@Override
 	public void initialze() {
-		map.fill(DirtFloor);
+		map.fill(Floor);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class Building extends MapCreator {
 		split(root, 0);
 		buildWalls(root);
 		buildDoors(root);
-		map.buildBoundary(DirtWall);
+		map.buildBoundary(Wall);
 	}
 
 	private void buildDoors(Room room) {
@@ -41,14 +41,14 @@ public class Building extends MapCreator {
 			if (room.isSplitVert()) {
 				int x = room.getSplitX();
 				for (int y = room.getY(); y < room.getY() + room.getHeight(); y++) {
-					if (map.get(x + 1, y) == DirtFloor && map.get(x - 1, y) == DirtFloor && y != 0 && y != height - 1) {
+					if (map.get(x + 1, y) == Floor && map.get(x - 1, y) == Floor && y != 0 && y != height - 1) {
 						points.add(new Point(x, y));
 					}
 				}
 			} else {
 				int y = room.getSplitY();
 				for (int x = room.getX(); x < room.getX() + room.getWidth(); x++) {
-					if (map.get(x, y + 1) == DirtFloor && map.get(x, y - 1) == DirtFloor && x != 0 && x != width - 1) {
+					if (map.get(x, y + 1) == Floor && map.get(x, y - 1) == Floor && x != 0 && x != width - 1) {
 						points.add(new Point(x, y));
 					}
 				}
@@ -67,12 +67,12 @@ public class Building extends MapCreator {
 			if (room.isSplitVert()) {
 				int x = room.getSplitX();
 				for (int y = room.getY(); y < room.getY() + room.getHeight(); y++) {
-					map.set(x, y, DirtWall);
+					map.set(x, y, Wall);
 				}
 			} else {
 				int y = room.getSplitY();
 				for (int x = room.getX(); x < room.getX() + room.getWidth(); x++) {
-					map.set(x, y, DirtWall);
+					map.set(x, y, Wall);
 				}
 			}
 

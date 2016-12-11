@@ -35,7 +35,7 @@ public class DungeonCell extends MapCreator {
 
 	@Override
 	public void initialze() {
-		map.fill(DirtWall);
+		map.fill(Wall);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class DungeonCell extends MapCreator {
             else{
                 firstX--;
             }
-            map.set(firstX, firstY, DirtFloor);
+            map.set(firstX, firstY, Floor);
         }
 
         while(firstY != secondY){
@@ -78,7 +78,7 @@ public class DungeonCell extends MapCreator {
             else{
                 firstY--;
             }
-            map.set(firstX, firstY, DirtFloor);
+            map.set(firstX, firstY, Floor);
         }
 
     }
@@ -132,7 +132,7 @@ public class DungeonCell extends MapCreator {
         for(Room room : rooms) {
             for (int y = room.getY()+1; y < room.getY() + room.getHeight()-1; y++) {
                 for(int x = room.getX()+1; x < room.getX() + room.getWidth()-1; x++){
-                	map.set(x, y, DirtFloor);
+                	map.set(x, y, Floor);
                 }
             }
         }

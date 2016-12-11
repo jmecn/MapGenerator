@@ -6,24 +6,30 @@ final public class Tile {
 	}
 
 	public final static int Unused = -1;
-	public final static int DirtFloor = 0;
-	public final static int DirtWall = 1;
-	public final static int StoneWall = 2;
+	public final static int Floor = 0;
+	public final static int Wall = 1;
+	public final static int Stone = 2;
 	public final static int Corridor = 3;
 	public final static int Door = 4;
 	public final static int UpStairs = 5;
 	public final static int DownStairs = 6;
 	public final static int Chest = 7;
+	// terrain
+	public final static int Water = 8;
+	public final static int Grass = 9;
+	public final static int Dirt = 10;
+	public final static int Moss = 11;
+	public final static int Tree = 12;
 
 	public final static char getChar(int value) {
 		switch (value) {
 		case Unused:
 			return ' ';
-		case DirtWall:
+		case Wall:
 			return '#';
-		case DirtFloor:
+		case Floor:
 			return '.';
-		case StoneWall:
+		case Stone:
 			return 'S';
 		case Corridor:
 			return '.';

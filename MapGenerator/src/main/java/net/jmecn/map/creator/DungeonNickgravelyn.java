@@ -382,7 +382,7 @@ public class DungeonNickgravelyn extends MapCreator {
         for (int y = 1; y < room.height - 2; y++) {
             for (int x = 1; x < room.width - 2; x++) {
                 // only put stairs on the floor
-                if (room.tiles[y][x] != DirtFloor) { continue; }
+                if (room.tiles[y][x] != Floor) { continue; }
                 
                 // make sure this floor isn't right next to a door
                 if (room.tiles[y - 1][x] == Door ||
@@ -450,9 +450,9 @@ public class DungeonNickgravelyn extends MapCreator {
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
-						tiles[y][x] = DirtWall;
+						tiles[y][x] = Wall;
 					} else {
-						tiles[y][x] = DirtFloor;
+						tiles[y][x] = Floor;
 					}
 				}
 			}

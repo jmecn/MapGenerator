@@ -213,7 +213,7 @@ public class Maze extends MapCreator {
 	private void makeWall(int x1, int y1, int x2, int y2) {
 		for (int y = y1; y <= y2; y++) {
 			for (int x = x1; x <= x2; x++) {
-				map.set(x, y, Tile.DirtWall);
+				map.set(x, y, Tile.Wall);
 			}
 		}
 	}

@@ -1,8 +1,11 @@
 package net.jmecn.map.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -39,11 +43,17 @@ import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
 import net.jmecn.map.creator.DungeonNickgravelyn;
 import net.jmecn.map.creator.DungeonTyrant;
+import net.jmecn.map.creator.Islands;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
 import net.jmecn.map.creator.MazeWilson;
 
-public class UI extends JFrame {
+/**
+ * The main UI for MapCreator
+ * @author yanmaoyuan
+ *
+ */
+public class UI extends JFrame implements ActionListener, ChangeListener {
 	/**
 	 * 
 	 */
@@ -52,22 +62,32 @@ public class UI extends JFrame {
 	ResourceBundle res = ResourceBundle.getBundle("net.jmecn.map.gui.UI");
 	
 	// MapCreater base
+	private List<MapCreator> mapCreators;
 	private MapCreator creator;
 	private int width;
 	private int height;
 	private long seed;
 	private boolean isRand;
 	
-	// Maze only
-	private int roadSize;
-	
-	// Dungeon only
-	private int maxFeatures;
-	
 	private int pixel;
 	private Canvas canvas;
-
-	private List<MapCreator> mapCreators;
+	
+	// Components
+	private JComboBox creatorList;
+	
+	private JLabel labelWidth;
+	private JSlider sliderWidth;
+	
+	private JLabel labelHeight;
+	private JSlider sliderHeight;
+	
+	private JLabel labelPixel;
+	private JSlider sliderPixel;
+	
+	private JCheckBox checkIsRand;
+	private JTextField seedText;
+	
+	private JButton btnCreate;
 	
 	public UI() {
 		try {
@@ -104,20 +124,19 @@ public class UI extends JFrame {
 	}
 
 	private void initMapCreators() {
+		Islands islands = new Islands(width, height);
 		CaveCellauto cellauto = new CaveCellauto(width, height);
 		
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
-		maxFeatures = 100;
 		DungeonTyrant tyrant = new DungeonTyrant(width, height);
-		tyrant.setMaxFeatures(maxFeatures);
+		tyrant.setMaxFeatures(100);
 		
 		DungeonNickgravelyn nickgravelyn = new DungeonNickgravelyn(width, height);
 		DungeonCell cell = new DungeonCell(width, height);
 		
-		roadSize = 1;
 		Maze maze = new Maze(width, height);
-		maze.setRoadSize(roadSize);
+		maze.setRoadSize(1);
 		
 		MazeWilson wmaze = new MazeWilson(width, height);
 		
@@ -125,6 +144,7 @@ public class UI extends JFrame {
 		
 		
 		mapCreators = new ArrayList<MapCreator>();
+		mapCreators.add(islands);
 		mapCreators.add(cellauto);
 		mapCreators.add(caveSanto);
 		mapCreators.add(tyrant);
@@ -135,6 +155,7 @@ public class UI extends JFrame {
 		mapCreators.add(building);
 		
 	}
+	
 	private JPanel getContentPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 
@@ -142,9 +163,10 @@ public class UI extends JFrame {
 		JScrollPane pane = new JScrollPane();
 		pane.setViewportView(canvas);
 		panel.add(pane, BorderLayout.CENTER);
+		panel.add(getOperationPane(), BorderLayout.EAST);
 
 		// the toolbar
-		panel.add(getJToolBar(), BorderLayout.EAST);
+		panel.add(getJToolBar(), BorderLayout.NORTH);
 
 		return panel;
 	}
@@ -162,11 +184,44 @@ public class UI extends JFrame {
 		updateCanvas();
 	}
 
-	void updateCanvas() {
+	/**
+	 * Update canvas, redraw the map.
+	 */
+	private void updateCanvas() {
 		canvas.setPixel(pixel);
 		canvas.setMap(creator.getMap());
 		
 		canvas.updateUI();
+	}
+	
+	/**
+	 * Save current BufferedImage to a png file.
+	 */
+	private void exportPng() {
+		try {
+			String name = creator.getClass().getSimpleName();
+			long time = System.currentTimeMillis();
+			ImageIO.write(canvas.getImage(), "png", new File(name + "_" + time + ".png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Save current Map2D to a txt file.
+	 */
+	private void exportTxt() {
+		try {
+			String name = creator.getClass().getSimpleName();
+			long time = System.currentTimeMillis();
+			
+			PrintStream out = new PrintStream(new FileOutputStream(name + "_" + time + ".txt"));
+			creator.getMap().printMapChars(out);
+			creator.getMap().printMapArray(out);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public JMenuBar getJMenuBar() {
@@ -178,13 +233,7 @@ public class UI extends JFrame {
 		JMenuItem export = new JMenuItem(res.getString("menu.exportPng"));
 		export.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					String name = creator.getClass().getSimpleName();
-					long time = System.currentTimeMillis();
-					ImageIO.write(canvas.getImage(), "png", new File(name + "_" + time + ".png"));
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				exportPng();
 			}
 		});
 		fMenu.add(export);
@@ -192,19 +241,10 @@ public class UI extends JFrame {
 		export = new JMenuItem(res.getString("menu.exportTxt"));
 		export.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					String name = creator.getClass().getSimpleName();
-					long time = System.currentTimeMillis();
-					
-					PrintStream out = new PrintStream(new FileOutputStream(name + "_" + time + ".txt"));
-					creator.getMap().printMapChars(out);
-					creator.getMap().printMapArray(out);
-					out.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				exportTxt();
 			}
 		});
+		
 		fMenu.add(export);
 
 		return bar;
@@ -213,114 +253,26 @@ public class UI extends JFrame {
 	public JToolBar getJToolBar() {
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
-		toolBar.setOrientation(JToolBar.VERTICAL);
+		toolBar.setOrientation(JToolBar.HORIZONTAL);
 		toolBar.setAlignmentY(5);
-		
-		final JComboBox combo = new JComboBox();
-		for(int i=0; i<mapCreators.size(); i++) {
-			combo.addItem(mapCreators.get(i).getName());
-		}
-		
-		combo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int index = combo.getSelectedIndex();
-				creator = mapCreators.get(index);
-				updateMap();
-			}
-		});
+		toolBar.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-		addTool(toolBar, combo);
-		
-		final JLabel l1 = new JLabel(MessageFormat.format(res.getString("label.height"), height));
-		addTool(toolBar, l1);
-
-		final JSlider rowSlider = new JSlider(JSlider.HORIZONTAL, 5, 100, height);
-		rowSlider.setMajorTickSpacing(10);
-		rowSlider.setPaintLabels(true);
-		rowSlider.setPaintTicks(true);
-		rowSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				height = rowSlider.getValue();
-				l1.setText(MessageFormat.format(res.getString("label.height"), height));
-				updateMap();
-			}
-		});
-		addTool(toolBar, rowSlider);
-
-		final JLabel l2 = new JLabel(MessageFormat.format(res.getString("label.width"), width));
-		addTool(toolBar, l2);
-
-		final JSlider colSlider = new JSlider(JSlider.HORIZONTAL, 5, 100, width);
-		colSlider.setMajorTickSpacing(10);
-		colSlider.setPaintLabels(true);
-		colSlider.setPaintTicks(true);
-		colSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				width = colSlider.getValue();
-				l2.setText(MessageFormat.format(res.getString("label.width"), width));
-				updateMap();
-			}
-		});
-		addTool(toolBar, colSlider);
-		
-		final JLabel l5 = new JLabel(MessageFormat.format(res.getString("label.pixel"), pixel));
-		addTool(toolBar, l5);
-
-		final JSlider pixelSlider = new JSlider(JSlider.HORIZONTAL, 8, 32, pixel);
-		pixelSlider.setPaintLabels(true);
-		pixelSlider.setMajorTickSpacing(8);
-		pixelSlider.setPaintTicks(true);
-		pixelSlider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				pixel = pixelSlider.getValue();
-				l5.setText(MessageFormat.format(res.getString("label.pixel"), pixel));
-				updateCanvas();
-			}
-		});
-		addTool(toolBar, pixelSlider);
-
-		final JTextField seedText = new JTextField(10);
-		seedText.setEnabled(!isRand);
-		
-		final JCheckBox isRandCheck = new JCheckBox(res.getString("checkbox.random"));
-		isRandCheck.setSelected(isRand);
-		isRandCheck.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				isRand = isRandCheck.isSelected();
-				seedText.setEnabled(!isRand);
-			}
-		});
-		addTool(toolBar, isRandCheck);
-
-		JLabel l4 = new JLabel(res.getString("label.seed"));
-		addTool(toolBar, l4);
-
-		seedText.setText(res.getString("creator.seed"));
-		addTool(toolBar, seedText);
-
-		JButton refreshBtn = new JButton(res.getString("btn.create"));
-		refreshBtn.addActionListener(new ActionListener() {
+		JButton btnCreate = new JButton(res.getString("btn.create"));
+		btnCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!isRand) {
 					String seeds = seedText.getText();
 					seed = md5(seeds);
 				}
-				
 				updateMap();
 			}
 		});
-		addTool(toolBar, refreshBtn);
+		
+		toolBar.add(btnCreate);
 		
 		return toolBar;
 	}
 
-	private void addTool(JToolBar toolBar, Component comp) {
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		panel.add(comp);
-		toolBar.add(panel);
-	}
-	
 	private long md5(String seeds) {
 		long value = seed;
 		try {
@@ -345,7 +297,178 @@ public class UI extends JFrame {
 		
 		return value;
 	}
+	
+	/**
+	 * This is the operation panel where you can change map width/height.
+	 * @return
+	 */
+	private Container getOperationPane() {
+		GridBagLayout gridBag =new GridBagLayout();
+		JPanel container =  new JPanel(gridBag);
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(getMapPanel(), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.WEST;
+		container.add(getCanvasPanel(), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.WEST;
+		
+		container.add(getSeedPanel(), gbc);
+		
+		gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = GridBagConstraints.RELATIVE;
+		gbc.anchor = GridBagConstraints.WEST;
+		
+		btnCreate = new JButton(res.getString("btn.create"));
+		btnCreate.addActionListener(this);
+		
+		container.add(btnCreate, gbc);
+		
+		return container;
+	}
+	
+	/**
+	 * In this panel, you choose the map creator to build a random map, use sliders to change map's width and height.
+	 * @return
+	 */
+	private Container getMapPanel() {
+		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
+		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.map")));
+		container.setPreferredSize(new Dimension(220, 240));
+		
+		creatorList = new JComboBox();
+		for(int i=0; i<mapCreators.size(); i++) {
+			creatorList.addItem(mapCreators.get(i).getName());
+		}
+		creatorList.addActionListener(this);
+		container.add(creatorList);
+		
+		labelWidth = new JLabel(MessageFormat.format(res.getString("label.width"), width));
+		labelWidth.setPreferredSize(new Dimension(200, 32));
+		container.add(labelWidth);
+		
+		sliderWidth = new JSlider(JSlider.HORIZONTAL, 5, 100, width);
+		sliderWidth.setMajorTickSpacing(10);
+		sliderWidth.setPaintLabels(true);
+		sliderWidth.setPaintTicks(true);
+		sliderWidth.addChangeListener(this);
+		container.add(sliderWidth);
+		
+		labelHeight = new JLabel(MessageFormat.format(res.getString("label.height"), height));
+		labelHeight.setPreferredSize(new Dimension(200, 32));
+		container.add(labelHeight);
 
+		sliderHeight = new JSlider(JSlider.HORIZONTAL, 5, 100, height);
+		sliderHeight.setMajorTickSpacing(10);
+		sliderHeight.setPaintLabels(true);
+		sliderHeight.setPaintTicks(true);
+		sliderHeight.addChangeListener(this);
+		container.add(sliderHeight);
+		
+		return container;
+	}
+	
+	/**
+	 * In this panel, you can change the canvas's attributes.
+	 * @return
+	 */
+	private Container getCanvasPanel() {
+		
+		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
+		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.canvas")));
+		container.setPreferredSize(new Dimension(220, 120));
+		
+		labelPixel = new JLabel(MessageFormat.format(res.getString("label.pixel"), pixel));
+		labelPixel.setPreferredSize(new Dimension(200, 32));
+		container.add(labelPixel);
+
+		sliderPixel = new JSlider(JSlider.HORIZONTAL, 4, 32, pixel);
+		sliderPixel.setPaintLabels(true);
+		sliderPixel.setMajorTickSpacing(4);
+		sliderPixel.setPaintTicks(true);
+		sliderPixel.addChangeListener(this);
+		container.add(sliderPixel);
+		
+		return container;
+	}
+	
+	/**
+	 * This panel used to change random settings.
+	 * @return
+	 */
+	private Container getSeedPanel() {
+		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
+		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.random")));
+		container.setPreferredSize(new Dimension(220, 120));
+		
+		checkIsRand = new JCheckBox(res.getString("checkbox.random"));
+		checkIsRand.setSelected(isRand);
+		checkIsRand.addChangeListener(this);
+		container.add(checkIsRand);
+		
+		seedText = new JTextField(16);
+		seedText.setText(res.getString("creator.seed"));
+		seedText.setEnabled(!isRand);
+		JPanel panel = new JPanel (new FlowLayout(FlowLayout.LEFT));
+		panel.add(new JLabel(res.getString("label.seed")));
+		panel.add(seedText);
+		panel.setPreferredSize(new Dimension(200, 32));
+		container.add(panel);
+		
+		return container;
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == creatorList) {
+			int index = creatorList.getSelectedIndex();
+			creator = mapCreators.get(index);
+			updateMap();
+		}
+		else if (e.getSource() == btnCreate) {
+			if (!isRand) {
+				String seeds = seedText.getText();
+				seed = md5(seeds);
+			}
+			updateMap();
+		}
+	}
+	
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if (e.getSource() == checkIsRand) {
+			isRand = checkIsRand.isSelected();
+			seedText.setEnabled(!isRand);
+		}
+		else if (e.getSource() == sliderWidth) {
+			width = sliderWidth.getValue();
+			labelWidth.setText(MessageFormat.format(res.getString("label.width"), width));
+			updateMap();
+		}
+		else if (e.getSource() == sliderHeight) {
+			height = sliderHeight.getValue();
+			labelHeight.setText(MessageFormat.format(res.getString("label.height"), height));
+			updateMap();
+		}
+		else if (e.getSource() == sliderPixel) {
+			pixel = sliderPixel.getValue();
+			labelPixel.setText(MessageFormat.format(res.getString("label.pixel"), pixel));
+			updateCanvas();
+		}
+	}
+	
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
