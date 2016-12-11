@@ -41,7 +41,7 @@ public class Maze extends MapCreator {
 	private int cellRows;
 	private int cellCnt;
 	
-	private static int ROAD_SIZE = 2;
+	private static int ROAD_SIZE = 1;
 	
 	public Maze(int width, int height) {
 		super("creator.maze", width * ROAD_SIZE + 1, height * ROAD_SIZE + 1);

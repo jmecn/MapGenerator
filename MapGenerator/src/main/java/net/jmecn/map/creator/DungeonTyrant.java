@@ -207,10 +207,8 @@ public class DungeonTyrant extends MapCreator {
 			int x = nextInt(1, width - 2);
 			int y = nextInt(1, height - 2);
 
-			if (!map.isAdjacent(x, y, Floor) && !map.isAdjacent(x, y, Corridor))
-				continue;
-
-			if (map.isAdjacent(x, y, Door))
+			int t = map.get(x, y);
+			if (!map.isAdjacent(x, y, Floor) || t  == Wall || t  == Door || map.isAdjacent(x, y, Door))
 				continue;
 
 			map.set(x, y, tile);

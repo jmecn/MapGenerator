@@ -47,6 +47,7 @@ import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
 import net.jmecn.map.creator.DungeonNickgravelyn;
 import net.jmecn.map.creator.DungeonTyrant;
+import net.jmecn.map.creator.DungeonYan;
 import net.jmecn.map.creator.Islands;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
@@ -143,23 +144,19 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 	
 	private void initMapCreators() {
 		Islands islands = new Islands(width, height);
-		CaveCellauto cellauto = new CaveCellauto(width, height);
 		
+		CaveCellauto cellauto = new CaveCellauto(width, height);
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
 		DungeonTyrant tyrant = new DungeonTyrant(width, height);
-		tyrant.setMaxFeatures(100);
-		
 		DungeonNickgravelyn nickgravelyn = new DungeonNickgravelyn(width, height);
 		DungeonCell cell = new DungeonCell(width, height);
+		DungeonYan unkonwn1 = new DungeonYan(width, height);
 		
 		Maze maze = new Maze(width, height);
-		maze.setRoadSize(1);
-		
 		MazeWilson wmaze = new MazeWilson(width, height);
 		
 		Building building = new Building(width, height);
-		
 		
 		mapCreators = new ArrayList<MapCreator>();
 		mapCreators.add(islands);
@@ -168,6 +165,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		mapCreators.add(tyrant);
 		mapCreators.add(nickgravelyn);
 		mapCreators.add(cell);
+		mapCreators.add(unkonwn1);
 		mapCreators.add(maze);
 		mapCreators.add(wmaze);
 		mapCreators.add(building);
