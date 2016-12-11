@@ -76,9 +76,8 @@ public class Islands extends MapCreator {
 		sum = 0;
 		floodFill8(x, y, Stone, Floor);
 		
-		// at least 45% place are floor
+		// at least 50% place are floor
 		double percent = 100.0 * sum/(width * height);
-		System.out.println(percent);
 		return percent >= 50.0;
 	}
 

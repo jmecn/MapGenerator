@@ -1,8 +1,8 @@
 package net.jmecn.map.creator;
 
-public class Dungeon extends MapCreator {
+public class DungeonUnknown1 extends MapCreator {
 
-	public Dungeon(int width, int height) {
+	public DungeonUnknown1(int width, int height) {
 		super("creator.dungeon.unknown1", width, height);
 	}
 

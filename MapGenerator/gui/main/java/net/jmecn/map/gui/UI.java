@@ -6,11 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.security.MessageDigest;
 import java.text.MessageFormat;
@@ -20,6 +23,7 @@ import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -123,6 +127,20 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 
 	}
 
+	private ImageIcon getScaledImage(String filename, int pixel) {
+		ImageIcon icon = null;
+		InputStream in = UI.class.getResourceAsStream(filename);
+		try {
+			BufferedImage image = ImageIO.read(in);
+			Image img = image.getScaledInstance(pixel, pixel, BufferedImage.SCALE_FAST);
+			icon = new ImageIcon(img);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return icon;
+	}
+	
 	private void initMapCreators() {
 		Islands islands = new Islands(width, height);
 		CaveCellauto cellauto = new CaveCellauto(width, height);
@@ -236,6 +254,8 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 				exportPng();
 			}
 		});
+		
+		export.setIcon(getScaledImage("img.png", 16));
 		fMenu.add(export);
 		
 		export = new JMenuItem(res.getString("menu.exportTxt"));
@@ -244,7 +264,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 				exportTxt();
 			}
 		});
-		
+		export.setIcon(getScaledImage("txt.png", 16));
 		fMenu.add(export);
 
 		return bar;
@@ -267,8 +287,27 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 				updateMap();
 			}
 		});
+		btnCreate.setIcon(getScaledImage("create.png", 32));
+		
+		JButton btnExportPng = new JButton(res.getString("menu.exportPng"));
+		btnExportPng.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exportPng();
+			}
+		});
+		btnExportPng.setIcon(getScaledImage("img.png", 32));
+		
+		JButton btnExportTxt = new JButton(res.getString("menu.exportTxt"));
+		btnExportTxt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exportTxt();
+			}
+		});
+		btnExportTxt.setIcon(getScaledImage("txt.png", 32));
 		
 		toolBar.add(btnCreate);
+		toolBar.add(btnExportPng);
+		toolBar.add(btnExportTxt);
 		
 		return toolBar;
 	}
@@ -333,6 +372,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		
 		btnCreate = new JButton(res.getString("btn.create"));
 		btnCreate.addActionListener(this);
+		btnCreate.setIcon(getScaledImage("create.png", 16));
 		
 		container.add(btnCreate, gbc);
 		
@@ -347,6 +387,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
 		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.map")));
 		container.setPreferredSize(new Dimension(220, 240));
+		container.setMinimumSize(new Dimension(220, 240));
 		
 		creatorList = new JComboBox();
 		for(int i=0; i<mapCreators.size(); i++) {
@@ -389,6 +430,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
 		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.canvas")));
 		container.setPreferredSize(new Dimension(220, 120));
+		container.setMinimumSize(new Dimension(220, 120));
 		
 		labelPixel = new JLabel(MessageFormat.format(res.getString("label.pixel"), pixel));
 		labelPixel.setPreferredSize(new Dimension(200, 32));
@@ -412,6 +454,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		JPanel container = new JPanel (new FlowLayout(FlowLayout.LEFT));
 		container.setBorder(BorderFactory.createTitledBorder(res.getString("panel.random")));
 		container.setPreferredSize(new Dimension(220, 120));
+		container.setMinimumSize(new Dimension(220, 120));
 		
 		checkIsRand = new JCheckBox(res.getString("checkbox.random"));
 		checkIsRand.setSelected(isRand);
