@@ -41,6 +41,16 @@ final public class Tile {
 			return '>';
 		case Chest:
 			return 'C';
+		case Water:
+			return 'w';
+		case Grass:
+			return '`';
+		case Dirt:
+			return 'o';
+		case Moss:
+			return '~';
+		case Tree:
+			return 'T';
 		default:
 			throw new RuntimeException("Unknown tile value=" + value);
 		}

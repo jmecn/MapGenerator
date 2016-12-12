@@ -166,6 +166,14 @@ public class Canvas extends JPanel {
 					drawWater(g, x, y);
 					break;
 				}
+				case Tile.Grass: {
+					drawGrass(g, x, y);
+					break;
+				}
+				case Tile.Tree: {
+					drawTree(g, x, y);
+					break;
+				}
 				}
 			}
 		}
@@ -235,6 +243,25 @@ public class Canvas extends JPanel {
 	
 	private void drawWater(Graphics g, int posX, int posY) {
 		drawBox(g, posX, posY, Color.BLUE);
+	}
+	
+	private void drawGrass(Graphics g, int posX, int posY) {
+		drawBox(g, posX, posY, new Color(0, 126, 0));
+	}
+	
+	private void drawTree(Graphics g, int posX, int posY) {
+		int x = 5 + posX * SIZE;
+		int y = 5 + posY * SIZE;
+		
+		int size = SIZE;
+		if (SIZE % 2 == 0) {
+			size--;
+		}
+		
+		g.setColor(Color.GREEN);
+		g.fillOval(x, y , size, SIZE/2+2);
+		g.setColor(Color.DARK_GRAY);
+		g.fillRect(x+size/2-1, y+SIZE/2+1, 3, SIZE/2);
 	}
 	
 	private void drawBox(Graphics g, int posX, int posY, Color color) {

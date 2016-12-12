@@ -46,9 +46,12 @@ import net.jmecn.map.creator.CaveCellauto;
 import net.jmecn.map.creator.CaveRandomWalk;
 import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
+import net.jmecn.map.creator.DungeonHauberk;
 import net.jmecn.map.creator.DungeonNickgravelyn;
+import net.jmecn.map.creator.DungeonTinykeep;
 import net.jmecn.map.creator.DungeonTyrant;
 import net.jmecn.map.creator.DungeonYan;
+import net.jmecn.map.creator.ForestHauberk;
 import net.jmecn.map.creator.Islands;
 import net.jmecn.map.creator.MapCreator;
 import net.jmecn.map.creator.Maze;
@@ -145,33 +148,21 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 	
 	private void initMapCreators() {
 		
-		CaveRandomWalk randomwalk = new CaveRandomWalk(width, height);
-		CaveCellauto cellauto = new CaveCellauto(width, height);
-		CaveSanto caveSanto = new CaveSanto(width, height);
-		
-		DungeonTyrant tyrant = new DungeonTyrant(width, height);
-		DungeonNickgravelyn nickgravelyn = new DungeonNickgravelyn(width, height);
-		DungeonCell cell = new DungeonCell(width, height);
-		DungeonYan unkonwn1 = new DungeonYan(width, height);
-		
-		Maze maze = new Maze(width, height);
-		MazeWilson wmaze = new MazeWilson(width, height);
-		
-		Islands islands = new Islands(width, height);
-		Building building = new Building(width, height);
-		
 		mapCreators = new ArrayList<MapCreator>();
-		mapCreators.add(randomwalk);
-		mapCreators.add(cellauto);
-		mapCreators.add(caveSanto);
-		mapCreators.add(tyrant);
-		mapCreators.add(nickgravelyn);
-		mapCreators.add(cell);
-		mapCreators.add(unkonwn1);
-		mapCreators.add(maze);
-		mapCreators.add(wmaze);
-		mapCreators.add(islands);
-		mapCreators.add(building);
+		mapCreators.add(new ForestHauberk(width, height));
+		mapCreators.add(new CaveRandomWalk(width, height));
+		mapCreators.add(new CaveCellauto(width, height));
+		mapCreators.add(new CaveSanto(width, height));
+		mapCreators.add(new DungeonTyrant(width, height));
+		mapCreators.add(new DungeonNickgravelyn(width, height));
+		mapCreators.add(new DungeonCell(width, height));
+		mapCreators.add(new DungeonYan(width, height));
+		mapCreators.add(new DungeonHauberk(width, height));
+		mapCreators.add(new DungeonTinykeep(width, height));
+		mapCreators.add(new Maze(width, height));
+		mapCreators.add(new MazeWilson(width, height));
+		mapCreators.add(new Islands(width, height));
+		mapCreators.add(new Building(width, height));
 		
 	}
 	
