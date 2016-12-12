@@ -43,6 +43,7 @@ import javax.swing.event.ChangeListener;
 
 import net.jmecn.map.creator.Building;
 import net.jmecn.map.creator.CaveCellauto;
+import net.jmecn.map.creator.CaveRandomWalk;
 import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.DungeonCell;
 import net.jmecn.map.creator.DungeonNickgravelyn;
@@ -143,8 +144,8 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 	}
 	
 	private void initMapCreators() {
-		Islands islands = new Islands(width, height);
 		
+		CaveRandomWalk randomwalk = new CaveRandomWalk(width, height);
 		CaveCellauto cellauto = new CaveCellauto(width, height);
 		CaveSanto caveSanto = new CaveSanto(width, height);
 		
@@ -156,10 +157,11 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		Maze maze = new Maze(width, height);
 		MazeWilson wmaze = new MazeWilson(width, height);
 		
+		Islands islands = new Islands(width, height);
 		Building building = new Building(width, height);
 		
 		mapCreators = new ArrayList<MapCreator>();
-		mapCreators.add(islands);
+		mapCreators.add(randomwalk);
 		mapCreators.add(cellauto);
 		mapCreators.add(caveSanto);
 		mapCreators.add(tyrant);
@@ -168,6 +170,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		mapCreators.add(unkonwn1);
 		mapCreators.add(maze);
 		mapCreators.add(wmaze);
+		mapCreators.add(islands);
 		mapCreators.add(building);
 		
 	}
