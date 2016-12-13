@@ -110,20 +110,25 @@ public class ForestHauberk extends MapCreator {
 		}
 
 		// Connect all of the points together.
-		List<Point> copy = new ArrayList<Point>(numMeadows);
-		copy.addAll(meadows);
-		while (copy.size() > 1) {
+		// Use Prim's algorithm to generate a minimum spanning tree.
+		List<Point> connected = new ArrayList<Point>(numMeadows);
+		
+		// the root node
+		connected.add(meadows.removeLast());
+		
+		while (!meadows.isEmpty()) {
 			Point bestFrom = null;
 			Point bestTo = null;
 			int bestDistance = -1;
 			
-			int len = copy.size();
-			for(int p=0; p<len; p++) {
-				Point from = copy.get(p);
-				for(int q=0; q<len; q++) {
+			int cLen = connected.size();
+			int mLen = meadows.size();
+			for(int p=0; p<cLen; p++) {
+				Point from = connected.get(p);
+				for(int q=0; q<mLen; q++) {
 					// skip the same point
 					if (q == p) continue;
-					Point to = copy.get(q);
+					Point to = meadows.get(q);
 					
 					int dx = from.x - to.x;
 					int dy = from.y - to.y;
@@ -136,10 +141,14 @@ public class ForestHauberk extends MapCreator {
 				}
 			}
 			
-			copy.remove(bestTo);
 			carvePath(bestFrom, bestTo);
+			meadows.remove(bestTo);
+			connected.add(bestTo);
 		}
 
+		meadows.addAll(connected);
+		connected.clear();
+		
 		// Carve out the meadows.
 		for(int p=0; p<numMeadows; p++) {
 			Point point = meadows.get(p);
