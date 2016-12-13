@@ -51,20 +51,50 @@ public class DungeonYan extends MapCreator {
 
 			if (room.type == Type.CORRIDOR) {
 				if (nextInt(4) == 0) {
-					generateCorridor(room, true);
+					generateCorridor(room);
 				} else {
 					generateRoom(room);
 				}
 			} else {
-				generateCorridor(room, false);
+				generateCorridor(room);
 			}
 		}
 
 		// generate downStairs
-		do {
-			room = randomRoom();
-		} while(room.type == Type.CORRIDOR || room.hasStairs());
-		map.set(room.x + room.width/2, room.y + room.height / 2, DownStairs);
+		
+		// travel the whole tree from the root node, find the deepest room and set a down stairs there.
+		deepest = -1;
+		best = null;
+		dfs(rooms.get(0), 0);
+		
+		if (best != null) {
+			map.set(best.x + best.width/2, best.y + best.height / 2, DownStairs);
+		} else {
+			System.out.println("Why didn't find any room ???");
+			
+			// random choose a room
+			do {
+				room = randomRoom();
+			} while(room.type == Type.CORRIDOR || room.hasStairs());
+			map.set(room.x + room.width/2, room.y + room.height / 2, DownStairs);
+		}
+	}
+	
+	private int deepest = 0;
+	private Room best = null;
+	private void dfs(Room root, int depth) {
+		if (root.children.size() > 0) {
+			for(Room r : root.children) {
+				dfs(r, depth+1);
+			}
+		}
+		
+		if(root.type == Type.ROOM) {
+			if (depth > deepest) {
+				deepest = depth;
+				best = root;
+			}
+		}
 	}
 
 	/**
@@ -107,7 +137,7 @@ public class DungeonYan extends MapCreator {
 			mid = nextInt(room.width-2) + 1 + room.x;
 			
 			newRoom.x = mid - halfW;
-			newRoom.y = room.x + room.height - 1;
+			newRoom.y = room.y + room.height - 1;
 			door = new Point(halfW, 0);
 			break;
 		case East:
@@ -131,13 +161,15 @@ public class DungeonYan extends MapCreator {
 		}
 
 		if (checkOn(newRoom, dir)) {
+			room.children.add(newRoom);
+			
 			rooms.add(newRoom);
 			newRoom.addDoor(door);
 			newRoom.print();
 		}
 	}
 
-	private void generateCorridor(Room room, boolean junction) {
+	private void generateCorridor(Room room) {
 		
 		if (room.doors.size() > 2) {
 			return;
@@ -219,11 +251,11 @@ public class DungeonYan extends MapCreator {
 		}
 		
 		if (checkOn(newRoom, dir)) {
+			room.addDoor(junctionDoor);
+			room.children.add(newRoom);
+			
 			rooms.add(newRoom);
 			newRoom.addDoor(door);
-			if (junction) {
-				room.addDoor(junctionDoor);
-			}
 			newRoom.print();
 		}
 	}
@@ -277,6 +309,9 @@ public class DungeonYan extends MapCreator {
 
 		// doors
 		List<Point> doors;
+		
+		// sub rooms
+		List<Room> children;
 
 		Room(int width, int height) {
 			assert width > 3;
@@ -287,6 +322,8 @@ public class DungeonYan extends MapCreator {
 			tiles = new int[height][width];
 
 			doors = new ArrayList<Point>();
+			children = new ArrayList<Room>();
+			
 			// surround the room with walls, and fill the rest with floors.
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
