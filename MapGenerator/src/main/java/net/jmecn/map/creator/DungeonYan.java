@@ -50,6 +50,7 @@ public class DungeonYan extends MapCreator {
 			room = randomRoom();
 
 			if (room.type == Type.CORRIDOR) {
+				// 25% chance to generate a new corridor
 				if (nextInt(4) == 0) {
 					generateCorridor(room);
 				} else {
@@ -171,6 +172,7 @@ public class DungeonYan extends MapCreator {
 
 	private void generateCorridor(Room room) {
 		
+		// in case that the dungeon become too much corridors
 		if (room.doors.size() > 2) {
 			return;
 		}
