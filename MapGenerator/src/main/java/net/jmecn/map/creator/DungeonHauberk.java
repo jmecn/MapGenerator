@@ -1,7 +1,6 @@
 package net.jmecn.map.creator;
 
 import static net.jmecn.map.Tile.*;
-import static net.jmecn.map.Direction.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -246,18 +245,20 @@ public class DungeonHauberk extends MapCreator {
 				if (map.get(x, y) != Wall)
 					continue;
 
-				Set<Integer> regions = new TreeSet<Integer>();
+				Set<Integer> regionss = new TreeSet<Integer>();
 				for (Point dir : Direction) {
-					Integer region = regions[y + dir.y][x + dir.x];
+					int a = x + dir.x;
+					int b = y + dir.y;
+					Integer region = regions[b][a];
 					if (region != null)
-						regions.add(region);
+						regionss.add(region);
 				}
 
-				if (regions.size() < 2)
+				if (regionss.size() < 2)
 					continue;
 
 				Point pos = new Point(x, y);
-				connectorRegions.put(pos, regions);
+				connectorRegions.put(pos, regionss);
 			}
 		}
 
@@ -313,7 +314,9 @@ public class DungeonHauberk extends MapCreator {
 			while (it.hasNext()) {
 				Point pos = it.next();
 				// Don't allow connectors right next to each other.
-				if (connector - pos < 2)
+				int dx = connector.x - pos.x;
+				int dy = connector.y - pos.y;
+				if (Math.sqrt(dx * dx + dy * dy) < 2)
 					it.remove();
 
 				// If the connector no long spans different regions, we don't
