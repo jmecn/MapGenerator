@@ -53,4 +53,9 @@ public class Point {
 		result = prime * result + y;
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return "Point(" + x + ", " + y + ")";
+	}
 }

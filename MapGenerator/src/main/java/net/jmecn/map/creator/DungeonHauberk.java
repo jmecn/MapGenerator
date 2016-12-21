@@ -3,7 +3,6 @@ package net.jmecn.map.creator;
 import static net.jmecn.map.Tile.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,7 @@ import net.jmecn.map.Point;
 /// 4. We randomly choose connectors and open them or place a door there until
 ///    all of the unconnected regions have been joined. There is also a slight
 ///    chance to carve a connector between two already-joined regions, so that
-///    the dungeon isn't single connected.
+///    the dungeon isn't single connected. <NOTICE: This is spanning tree!>
 /// 5. The mazes will have a lot of dead ends. Finally, we remove those by
 ///    repeatedly filling in any open tile that's closed on three sides. When
 ///    this is done, every corridor in a maze actually leads somewhere.
@@ -46,7 +45,7 @@ import net.jmecn.map.Point;
  * for this article： https://github.com/munificent/rooms-and-mazes
  * 
  * source:
- * https://github.com/munificent/hauberk/blob/db360d9efa714efb6d937c31953ef849c7394a39/lib/src/content/dungeon.dart
+ * https://github.com/munificent/hauberk/blob/master/lib/src/content/dungeon.dart
  * 
  * 
  * 
@@ -84,25 +83,25 @@ public class DungeonHauberk extends MapCreator {
 		}
 
 	}
-
+	
 	static Point[] Direction = { new Point(1, 0), new Point(0, 1), new Point(-1, 0), new Point(0, -1) };
-	int numRoomTries;
+	int numRoomTries = 200;
 
 	/// The inverse chance of adding a connector between two regions that have
 	/// already been joined. Increasing this leads to more loosely connected
 	/// dungeons.
-	int extraConnectorChance;// =>20;
+	int extraConnectorChance = 20;// =>20;
 
 	/// Increasing this allows rooms to be larger.
 	int roomExtraSize;// =>0;
 
-	int windingPercent;// =>0;
+	int windingPercent = 45;// =>0;
 
 	private List<Rect> rooms = new ArrayList<Rect>();
 
 	/// For each open position in the dungeon, the index of the connected region
 	/// that that position is a part of.
-	private Integer[][] regions;
+	private int[][] regions;
 
 	/// The index of the current region being carved.
 	private int currentRegion = -1;
@@ -114,82 +113,41 @@ public class DungeonHauberk extends MapCreator {
 	@Override
 	public void initialze() {
 		if (width % 2 == 0 || height % 2 == 0) {
-			throw new RuntimeException("The map must be odd-sized.");
+			// throw new RuntimeException("The map must be odd-sized.");
 		}
 
+		// init map
 		map.fill(Wall);
 
+		// init regions
+		currentRegion = Unused;
+		regions = new int[height][width];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				regions[y][x] = Unused;
+			}
+		}
+
+		// clear rooms
+		rooms.clear();
 	}
 
 	@Override
 	public void create() {
-		regions = new Integer[height][width];
 
 		addRooms();
 
-		// Fill in all of the empty space with mazes.
-		for (int y = 1; y < height; y += 2) {
-			for (int x = 1; x < width; x += 2) {
-				Point pos = new Point(x, y);
-				if (map.get(x, y) != Wall)
-					continue;
-				_growMaze(pos);
-			}
-		}
+		addMazes();
 
 		connectRegions();
+
 		removeDeadEnds();
 
 	}
 
-	/// Implementation of the "growing tree" algorithm from here:
-	/// http://www.astrolog.org/labyrnth/algrithm.htm.
-	void _growMaze(Point start) {
-		LinkedList<Point> cells = new LinkedList<Point>();
-		Point lastDir = null;
-
-		startRegion();
-		carve(start.x, start.y);
-
-		cells.add(start);
-		while (!cells.isEmpty()) {
-			Point cell = cells.getLast();
-
-			// See which adjacent cells are open.
-			ArrayList<Point> unmadeCells = new ArrayList<Point>();
-			for (Point dir : Direction) {
-				if (canCarve(cell, dir))
-					unmadeCells.add(dir);
-			}
-
-			if (!unmadeCells.isEmpty()) {
-				// Based on how "windy" passages are, try to prefer carving in
-				// the
-				// same direction.
-				Point dir;
-				if (unmadeCells.contains(lastDir) && nextInt(100) > windingPercent) {
-					dir = lastDir;
-				} else {
-					int index = nextInt(unmadeCells.size());
-					dir = unmadeCells.get(index);
-				}
-
-				carve(cell.x + dir.x, cell.y + dir.y);
-				carve(cell.x + dir.x * 2, cell.y + dir.y * 2);
-
-				cells.add(new Point(cell.x + dir.x * 2, cell.y + dir.y * 2));
-				lastDir = dir;
-			} else {
-				// No adjacent uncarved cells.
-				cells.removeLast();
-
-				// This path has ended.
-				lastDir = null;
-			}
-		}
-	}
-
-	/// Places rooms ignoring the existing maze corridors.
+	/**
+	 * Places rooms ignoring the existing maze corridors.
+	 */
 	private void addRooms() {
 		for (int i = 0; i < numRoomTries; i++) {
 			// Pick a random room size. The funny math here does two things:
@@ -221,53 +179,172 @@ public class DungeonHauberk extends MapCreator {
 				}
 			}
 
-			if (overlaps)
+			if (overlaps) {
 				continue;
+			}
 
 			rooms.add(room);
 
 			startRegion();
-			for (int yy = y; yy < height; yy++) {
-				for (int xx = x; xx < width; xx++) {
+			for (int yy = y; yy < y + height; yy++) {
+				for (int xx = x; xx < x + width; xx++) {
 					carve(xx, yy);
 				}
 			}
 		}
 	}
 
-	private void connectRegions() {
-		// Find all of the tiles that can connect two (or more) regions.
-		HashMap<Point, Set<Integer>> connectorRegions = new HashMap<Point, Set<Integer>>();
+	/**
+	 * Fill in all of the empty space with mazes.
+	 */
+	private void addMazes() {
+		// Fill in all of the empty space with mazes.
+		for (int y = 1; y < height; y += 2) {
+			for (int x = 1; x < width; x += 2) {
+				Point pos = new Point(x, y);
+				if (map.get(x, y) != Wall)
+					continue;
+				growMaze(pos);
+			}
+		}
+	}
 
+	/**
+	 * Implementation of the "growing tree" algorithm from here:
+	 * http://www.astrolog.org/labyrnth/algrithm.htm.
+	 * 
+	 * This is a general algorithm, capable of creating Mazes of different
+	 * textures. It requires storage up to the size of the Maze. Each time you
+	 * carve a cell, add that cell to a list. Proceed by picking a cell from the
+	 * list, and carving into an unmade cell next to it. If there are no unmade
+	 * cells next to the current cell, remove the current cell from the list.
+	 * The Maze is done when the list becomes empty. The interesting part that
+	 * allows many possible textures is how you pick a cell from the list. For
+	 * example, if you always pick the most recent cell added to it, this
+	 * algorithm turns into the recursive backtracker. If you always pick cells
+	 * at random, this will behave similarly but not exactly to Prim's
+	 * algorithm. If you always pick the oldest cells added to the list, this
+	 * will create Mazes with about as low a "river" factor as possible, even
+	 * lower than Prim's algorithm. If you usually pick the most recent cell,
+	 * but occasionally pick a random cell, the Maze will have a high "river"
+	 * factor but a short direct solution. If you randomly pick among the most
+	 * recent cells, the Maze will have a low "river" factor but a long windy
+	 * solution.
+	 * 
+	 * @param start
+	 */
+	private void growMaze(Point start) {
+		LinkedList<Point> cells = new LinkedList<Point>();
+		Point lastDir = null;
+
+		startRegion();
+		carve(start.x, start.y);
+
+		cells.add(start);
+		while (!cells.isEmpty()) {
+			Point cell = cells.getLast();
+
+			// See which adjacent cells are open.
+			ArrayList<Point> unmadeCells = new ArrayList<Point>();
+			for (Point dir : Direction) {
+				if (canCarve(cell, dir))
+					unmadeCells.add(dir);
+			}
+
+			if (!unmadeCells.isEmpty()) {
+				// Based on how "windy" passages are, try to prefer carving in
+				// the same direction.
+				Point dir;
+				if (unmadeCells.contains(lastDir) && nextInt(100) > windingPercent) {
+					dir = lastDir;
+				} else {
+					int index = nextInt(unmadeCells.size());
+					dir = unmadeCells.get(index);
+				}
+
+				// carve(cell + dir)
+				carve(cell.x + dir.x, cell.y + dir.y);
+				// carve(cell + dir*2)
+				carve(cell.x + dir.x * 2, cell.y + dir.y * 2);
+
+				cells.add(new Point(cell.x + dir.x * 2, cell.y + dir.y * 2));
+				lastDir = dir;
+			} else {
+				// No adjacent uncarved cells.
+				cells.removeLast();
+
+				// This path has ended.
+				lastDir = null;
+			}
+		}
+	}
+
+	private void connectRegions() {
+		
+		class Connector extends Point {
+			int[] regions;
+			int length;
+			Connector(int x, int y) {
+				super(x, y);
+				regions = new int[]{-1, -1};
+				length = 0;
+			}
+
+			boolean contains(final int region) {
+				if (length == 0) return false;
+				
+				for(int i=0; i<length; i++) {
+					if (regions[i] == region)
+						return true;
+				}
+				
+				return false;
+			}
+			void add(final int region) {
+				if (!contains(region)) {
+					if (length < 2) {
+						regions[length++] = region;
+					}
+				}
+			}
+
+			boolean diff(Connector conn) {
+				if (regions[0] == conn.regions[0] && regions[1] == conn.regions[1])
+					return false;
+				if (regions[1] == conn.regions[0] && regions[0] == conn.regions[1])
+					return false;
+				return true;
+			}
+			
+		}
+		
+		// Find all of the tiles that can connect two (or more) regions.
+		List<Connector> connectors = new ArrayList<Connector>();
 		for (int y = 1; y < height - 1; y++) {
 			for (int x = 1; x < width - 1; x++) {
 				// Can't already be part of a region.
 				if (map.get(x, y) != Wall)
 					continue;
 
-				Set<Integer> regionss = new TreeSet<Integer>();
+				Connector conn = new Connector(x, y);
+				
 				for (Point dir : Direction) {
-					int a = x + dir.x;
-					int b = y + dir.y;
-					Integer region = regions[b][a];
-					if (region != null)
-						regionss.add(region);
+					int region = regions[y+dir.y][x+dir.x];
+					if (region != Unused) {
+						conn.add(region);
+					}
 				}
 
-				if (regionss.size() < 2)
+				if (conn.length < 2)
 					continue;
 
-				Point pos = new Point(x, y);
-				connectorRegions.put(pos, regionss);
+				connectors.add(conn);
 			}
 		}
 
-		List<Point> connectors = new ArrayList<Point>();
-		connectors.addAll(connectorRegions.keySet());
-
 		// Keep track of which regions have been merged. This maps an original
 		// region index to the one it has been merged to.
-		int[] merged = new int[currentRegion];
+		int[] merged = new int[currentRegion+1];
 		Set<Integer> openRegions = new TreeSet<Integer>();
 		for (int i = 0; i <= currentRegion; i++) {
 			merged[i] = i;
@@ -276,79 +353,65 @@ public class DungeonHauberk extends MapCreator {
 
 		// Keep connecting regions until we're down to one.
 		while (openRegions.size() > 1) {
-			Point connector = connectors.get(nextInt(connectors.size()));
+			
+			int connLen = connectors.size();
+			Connector conn = connectors.get(nextInt(connLen));
 
 			// Carve the connection.
-			addJunction(connector);
+			addJunction(conn);
 
 			// Merge the connected regions. We'll pick one region (arbitrarily)
-			// and
-			// map all of the other regions to its index.
-			List<Integer> regions = new ArrayList<Integer>();
-			for (Integer region : connectorRegions.get(connector)) {
-				if (merged[region] != 0) {
-					regions.add(region);
-				}
+			// and map all of the other regions to its index.
+			int[] regions = new int[conn.length];
+			for (int i=0; i<conn.length; i++) {
+				int region = conn.regions[i];
+				regions[i] = merged[region];
 			}
 
-			Integer dest = regions.get(0);
-			List<Integer> sources = regions.subList(1, regions.size() - 1);
-
-			// Merge all of the affected regions. We have to look at *all* of
-			// the
-			// regions because other regions may have previously been merged
-			// with
+			int dest = regions[0];
+			// Merge all of the affected regions. We have to look at *all* of the
+			// regions because other regions may have previously been merged with
 			// some of the ones we're merging now.
 			for (int i = 0; i <= currentRegion; i++) {
-				if (sources.contains(merged[i])) {
-					merged[i] = dest;
+				for(int j = 1; j<regions.length; j++) {
+					if (regions[j] == merged[i]) {
+						merged[i] = dest;
+					}
 				}
 			}
 
 			// The sources are no longer in use.
-			openRegions.removeAll(sources);
+			for(int i = 1; i<regions.length; i++) {
+				openRegions.remove(regions[i]);
+			}
 
 			// Remove any connectors that aren't needed anymore.
-
-			Iterator<Point> it = connectors.iterator();
+			Iterator<Connector> it = connectors.iterator();
 			while (it.hasNext()) {
-				Point pos = it.next();
+				Connector c = it.next();
+				
 				// Don't allow connectors right next to each other.
-				int dx = connector.x - pos.x;
-				int dy = connector.y - pos.y;
-				if (Math.sqrt(dx * dx + dy * dy) < 2)
+				int dx = conn.x - c.x;
+				int dy = conn.y - c.y;
+				if (Math.sqrt(dx * dx + dy * dy) <= 1) {
 					it.remove();
-
-				// If the connector no long spans different regions, we don't
-				// need it.
-				regions.clear();
-				for (Integer region : connectorRegions.get(pos)) {
-					if (merged[region] != 0) {
-						regions.add(region);
-					}
 				}
-
-				if (regions.size() > 1)
-					continue;
-
-				// This connecter isn't needed, but connect it occasionally so
-				// that the
-				// dungeon isn't singly-connected.
-				if (nextInt(extraConnectorChance) == 0)
-					addJunction(pos);
-
-				it.remove();
-
+				// If the connector no long spans different regions, we don't need it.
+				else if (!conn.diff(c)) {
+					// This connecter isn't needed, but connect it occasionally so
+					// that the dungeon isn't singly-connected.
+					if (nextInt(extraConnectorChance) == 0)
+						addJunction(c);
+	
+					it.remove();
+				}
 			}
+			
 		}
 	}
 
 	private void addJunction(Point pos) {
-		if (nextInt(4) == 0) {
-			map.set(pos.x, pos.y, nextInt(3) == 0 ? Door : Floor);
-		} else {
-			map.set(pos.x, pos.y, Door);
-		}
+		map.set(pos.x, pos.y, Door);
 	}
 
 	private void removeDeadEnds() {
@@ -379,10 +442,16 @@ public class DungeonHauberk extends MapCreator {
 		}
 	}
 
-	/// Gets whether or not an opening can be carved from the given starting
-	/// [Cell] at [pos] to the adjacent Cell facing [direction]. Returns `true`
-	/// if the starting Cell is in bounds and the destination Cell is filled
-	/// (or out of bounds).</returns>
+	/**
+	 * Gets whether or not an opening can be carved from the given starting
+	 * [Cell] at [pos] to the adjacent Cell facing [direction]. Returns `true`
+	 * if the starting Cell is in bounds and the destination Cell is filled (or
+	 * out of bounds).</returns>
+	 * 
+	 * @param pos
+	 * @param direction
+	 * @return
+	 */
 	private boolean canCarve(Point pos, Point direction) {
 		// Must end in bounds.
 		int x = pos.x + direction.x * 3;
