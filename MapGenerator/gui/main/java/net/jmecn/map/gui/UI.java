@@ -43,7 +43,6 @@ import javax.swing.event.ChangeListener;
 
 import net.jmecn.map.creator.Building;
 import net.jmecn.map.creator.CaveCellauto;
-import net.jmecn.map.creator.CaveRandomWalk;
 import net.jmecn.map.creator.CaveSanto;
 import net.jmecn.map.creator.CityLeafVenation;
 import net.jmecn.map.creator.DungeonCell;
@@ -152,7 +151,6 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		mapCreators = new ArrayList<MapCreator>();
 		mapCreators.add(new CityLeafVenation(width, height));
 		mapCreators.add(new ForestHauberk(width, height));
-		mapCreators.add(new CaveRandomWalk(width, height));
 		mapCreators.add(new CaveCellauto(width, height));
 		mapCreators.add(new CaveSanto(width, height));
 		mapCreators.add(new DungeonTyrant(width, height));
