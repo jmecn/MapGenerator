@@ -3,11 +3,8 @@ package net.jmecn.map.creator;
 import static net.jmecn.map.Tile.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import net.jmecn.map.Point;
 
@@ -279,134 +276,153 @@ public class DungeonHauberk extends MapCreator {
 		}
 	}
 
-	private void connectRegions() {
-		
-		class Connector extends Point {
-			int[] regions;
-			int length;
-			Connector(int x, int y) {
-				super(x, y);
-				regions = new int[]{-1, -1};
-				length = 0;
-			}
-
-			boolean contains(final int region) {
-				if (length == 0) return false;
-				
-				for(int i=0; i<length; i++) {
-					if (regions[i] == region)
-						return true;
-				}
-				
-				return false;
-			}
-			void add(final int region) {
-				if (!contains(region)) {
-					if (length < 2) {
-						regions[length++] = region;
-					}
-				}
-			}
-
-			boolean diff(Connector conn) {
-				if (regions[0] == conn.regions[0] && regions[1] == conn.regions[1])
-					return false;
-				if (regions[1] == conn.regions[0] && regions[0] == conn.regions[1])
-					return false;
-				return true;
-			}
-			
+	class Graph {
+		Edge[][] matrix;
+		Graph(int vCnt) {
+			matrix = new Edge[vCnt][vCnt];
 		}
 		
+		Edge get(int x, int y) {
+			return matrix[x][y];
+		}
+		
+		void union(int x, int y, Point p) {
+			if (matrix[x][y] == null) {
+				Edge e = new Edge();
+				matrix[x][y] = matrix[y][x] = e;
+				
+				if (x > y) {
+					e.a = y;
+					e.b = x;
+				} else {
+					e.a = x;
+					e.b = y;
+				}
+			}
+			matrix[x][y].add(p);
+		}
+		
+	}
+	
+	class Edge {
+		int a, b;
+		ArrayList<Point> points;
+		
+		Edge() {
+			points = new ArrayList<Point>();
+		}
+
+		void add(Point p) {
+			points.add(p);
+		}
+		
+		Point rand() {
+			int index = nextInt(points.size());
+			return points.get(index);
+		}
+
+	}
+	
+	private void connectRegions() {
+		
 		// Find all of the tiles that can connect two (or more) regions.
-		List<Connector> connectors = new ArrayList<Connector>();
+		Graph graph = new Graph(currentRegion+1);
 		for (int y = 1; y < height - 1; y++) {
 			for (int x = 1; x < width - 1; x++) {
 				// Can't already be part of a region.
 				if (map.get(x, y) != Wall)
 					continue;
 
-				Connector conn = new Connector(x, y);
-				
+				int a = -1;
+				int b = -1;
 				for (Point dir : Direction) {
 					int region = regions[y+dir.y][x+dir.x];
 					if (region != Unused) {
-						conn.add(region);
+						
+						if (a == -1) {
+							a = region;
+						} else {
+							if (b == -1 && a != region) {
+								b = region;
+							}
+						}
 					}
 				}
 
-				if (conn.length < 2)
-					continue;
-
-				connectors.add(conn);
+				if (a != -1 && b != -1) {
+					graph.union(a, b, new Point(x, y));
+				}
 			}
 		}
 
 		// Keep track of which regions have been merged. This maps an original
 		// region index to the one it has been merged to.
-		int[] merged = new int[currentRegion+1];
-		Set<Integer> openRegions = new TreeSet<Integer>();
+		List<Integer> openRegions = new ArrayList<Integer>();
 		for (int i = 0; i <= currentRegion; i++) {
-			merged[i] = i;
 			openRegions.add(i);
 		}
-
+		
+		int len = openRegions.size();
+		int root = openRegions.get(nextInt(len));
+		openRegions.remove(new Integer(root));
+		
+		List<Integer> tree = new ArrayList<Integer>();
+		tree.add(root);
+		
 		// Keep connecting regions until we're down to one.
-		while (openRegions.size() > 1) {
+		while (openRegions.size() > 0) {
 			
-			int connLen = connectors.size();
-			Connector conn = connectors.get(nextInt(connLen));
-
-			// Carve the connection.
-			addJunction(conn);
-
-			// Merge the connected regions. We'll pick one region (arbitrarily)
-			// and map all of the other regions to its index.
-			int[] regions = new int[conn.length];
-			for (int i=0; i<conn.length; i++) {
-				int region = conn.regions[i];
-				regions[i] = merged[region];
-			}
-
-			int dest = regions[0];
-			// Merge all of the affected regions. We have to look at *all* of the
-			// regions because other regions may have previously been merged with
-			// some of the ones we're merging now.
-			for (int i = 0; i <= currentRegion; i++) {
-				for(int j = 1; j<regions.length; j++) {
-					if (regions[j] == merged[i]) {
-						merged[i] = dest;
-					}
+			len = tree.size();
+			root = tree.get(nextInt(len));
+			
+			List<Edge> edges = new ArrayList<Edge>();
+			len = openRegions.size();
+			for(int i=0; i<len; i++) {
+				int b = openRegions.get(i);
+				Edge e = graph.get(root, b);
+				if (e != null) {
+					edges.add(e);
 				}
 			}
-
-			// The sources are no longer in use.
-			for(int i = 1; i<regions.length; i++) {
-				openRegions.remove(regions[i]);
+//			len = currentRegion + 1;
+//			for(int i=0; i<=currentRegion; i++) {
+//				if (i==root)
+//					continue;
+//				
+//				Edge e = graph.get(root, i);
+//				if (e != null) {
+//					if (e.points.size() > 0)
+//						edges.add(e);
+//				}
+//			}
+			
+			if (edges.size() == 0) {
+				continue;
 			}
-
-			// Remove any connectors that aren't needed anymore.
-			Iterator<Connector> it = connectors.iterator();
-			while (it.hasNext()) {
-				Connector c = it.next();
+			else {
+				len = edges.size();
+				Edge e = edges.get(nextInt(len));
 				
-				// Don't allow connectors right next to each other.
-				int dx = conn.x - c.x;
-				int dy = conn.y - c.y;
-				if (Math.sqrt(dx * dx + dy * dy) <= 1) {
-					it.remove();
+				int b = e.b;
+				if (b == root) b = e.a;
+				
+				
+				if (openRegions.remove(new Integer(b))) {
+					tree.add(b);
+//				} else {
+//					if (nextInt(extraConnectorChance) != 0) {
+//						continue;
+//					}
 				}
-				// If the connector no long spans different regions, we don't need it.
-				else if (!conn.diff(c)) {
-					// This connecter isn't needed, but connect it occasionally so
-					// that the dungeon isn't singly-connected.
-					if (nextInt(extraConnectorChance) == 0)
-						addJunction(c);
-	
-					it.remove();
-				}
+				
+				List<Point> points = e.points;
+				// Carve the connection.
+				len = points.size();
+				Point p = points.get(nextInt(len));
+				addJunction(p);
+				points.clear();
 			}
-			
+
 		}
 	}
 
