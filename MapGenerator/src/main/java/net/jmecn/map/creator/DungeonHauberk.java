@@ -111,6 +111,7 @@ public class DungeonHauberk extends MapCreator {
 	public void initialze() {
 		if (width % 2 == 0 || height % 2 == 0) {
 			// throw new RuntimeException("The map must be odd-sized.");
+			return;
 		}
 
 		// init map
@@ -131,7 +132,11 @@ public class DungeonHauberk extends MapCreator {
 
 	@Override
 	public void create() {
-
+		if (width % 2 == 0 || height % 2 == 0) {
+			// throw new RuntimeException("The map must be odd-sized.");
+			return;
+		}
+		
 		addRooms();
 
 		addMazes();
