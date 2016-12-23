@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.jmecn.map.Point;
+import net.jmecn.map.Rect;
 
 /// The random dungeon generator.
 ///
@@ -37,15 +38,30 @@ import net.jmecn.map.Point;
 /**
  * 
  * project: https://github.com/munificent/hauberk
- * 
  * article: http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/ demo
  * for this article： https://github.com/munificent/rooms-and-mazes
- * 
  * source:
  * https://github.com/munificent/hauberk/blob/master/lib/src/content/dungeon.dart
  * 
  * 
+ * Another algorithm used in TinyKeep is similar to this one.
  * 
+ * http://tinykeep.com/dungen/
+ * 
+ * https://www.reddit.com/r/gamedev/comments/1dlwc4/procedural_dungeon_generation_algorithm_explained/
+ * 
+ * https://github.com/adonaac/blog/issues/7
+ * 
+ * http://www.gamasutra.com/blogs/AAdonaac/20150903/252889/Procedural_Dungeon_Generation_Algorithm.php
+ * 
+ * Delaunay Triangulation + Graph
+ * 
+ * Read more:
+ * 
+ * https://en.wikipedia.org/wiki/Delaunay_triangulation
+ * http://paulbourke.net/papers/triangulate/
+ * http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
+ * https://en.wikipedia.org/wiki/Delaunay_tessellation_field_estimator
  * 
  * 
  * @author yanmaoyuan
@@ -53,34 +69,6 @@ import net.jmecn.map.Point;
  */
 public class DungeonHauberk extends MapCreator {
 
-	class Rect {
-		int x, y, width, height;
-
-		public Rect() {
-			x = y = width = height = 0;
-		}
-
-		public Rect(int x, int y, int width, int height) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-		}
-
-		boolean valueInRange(int value, int min, int max) {
-			return (value <= max) && (value >= min);
-		}
-
-		boolean overlap(Rect B) {
-			boolean xOverlap = valueInRange(x, B.x, B.x + B.width) || valueInRange(B.x, x, x + width);
-
-			boolean yOverlap = valueInRange(y, B.y, B.y + B.height) || valueInRange(B.y, y, y + height);
-
-			return xOverlap && yOverlap;
-		}
-
-	}
-	
 	static Point[] Direction = { new Point(1, 0), new Point(0, 1), new Point(-1, 0), new Point(0, -1) };
 	int numRoomTries = 200;
 

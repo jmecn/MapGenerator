@@ -3,9 +3,11 @@ package net.jmecn.map.creator;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.jmecn.map.Point;
+import net.jmecn.map.Rect;
+
 import static net.jmecn.map.Direction.*;
 import static net.jmecn.map.Tile.*;
-import net.jmecn.map.Point;
 
 /**
  * A dungeon algorithm in JavaScript
@@ -429,22 +431,11 @@ public class DungeonNickgravelyn extends MapCreator {
 		return false;
 	}
 
-	private static class Room {
-		// size
-		int width;
-		int height;
-
-		// pos
-		int x = 0;
-		int y = 0;
+	private static class Room extends Rect {
 		int[][] tiles;
 
 		Room(int width, int height) {
-			assert width > 0;
-			assert height > 0;
-
-			this.width = width;
-			this.height = height;
+			super(0, 0, width, height);
 			tiles = new int[height][width];
 			// surround the room with walls, and fill the rest with floors.
 			for (int y = 0; y < height; y++) {

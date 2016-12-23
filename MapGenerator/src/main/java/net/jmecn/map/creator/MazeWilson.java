@@ -16,6 +16,18 @@ import net.jmecn.map.Point;
  */
 public class MazeWilson extends MapCreator {
 
+	class Cell extends Point {
+		int tile;
+		Cell(int x, int y) {
+			super(x, y);
+			tile = Unused;
+		}
+		Cell(int x, int y, int tile) {
+			super(x, y);
+			this.tile = tile;
+		}
+	}
+	
 	static Logger logger = Logger.getLogger(MazeWilson.class.getName());
 
 	public MazeWilson(int width, int height) {
@@ -33,7 +45,7 @@ public class MazeWilson extends MapCreator {
 		map.set(1, height - 2, Floor);
 
 		// the first start point.
-		Point nextStart = new Point(3, height - 2);
+		Cell nextStart = new Cell(3, height - 2);
 		while (nextStart != null) {
 			erasedLoopWalk(nextStart.x, nextStart.y);
 			nextStart = findNextStartCell(nextStart);
@@ -41,10 +53,10 @@ public class MazeWilson extends MapCreator {
 	}
 
 	private void erasedLoopWalk(int x, int y) {
-		ArrayList<Point> trail = new ArrayList<Point>();
+		ArrayList<Cell> trail = new ArrayList<Cell>();
 		ArrayList<Integer> moveLog = new ArrayList<Integer>(); // should always
 
-		trail.add(new Point(x, y, Stone));
+		trail.add(new Cell(x, y, Stone));
 		map.set(x, y, Stone);
 
 		moveLog.add(UnknownDir);// placeholder that hopefully won't break anything
@@ -74,7 +86,7 @@ public class MazeWilson extends MapCreator {
 				if (move == South)
 					y++;
 
-				trail.add(new Point(x, y, Stone));// add the new piece of the trail
+				trail.add(new Cell(x, y, Stone));// add the new piece of the trail
 				map.set(x, y, Stone);// change its tile for collision purposes
 
 				// look for loops and erase back if found
@@ -114,10 +126,10 @@ public class MazeWilson extends MapCreator {
 				}
 
 				if (looped) {
-					int retrace = trail.indexOf(new Point(x, y));
+					int retrace = trail.indexOf(new Cell(x, y));
 
 					for (int j = retrace + 1; j < trail.size(); j++) {
-						Point p = trail.get(j);
+						Cell p = trail.get(j);
 						map.set(p.x, p.y, Wall);
 					}
 
@@ -130,7 +142,7 @@ public class MazeWilson extends MapCreator {
 				// look for connections and commit if found
 				if (i == 0 && (map.get(x - 1, y) == Floor || map.get(x + 1, y) == Floor
 						|| map.get(x, y - 1) == Floor || map.get(x, y + 1) == Floor)) {
-					for (Point p : trail) {
+					for (Cell p : trail) {
 						map.set(p.x, p.y, Floor);
 					}
 					return;
@@ -142,7 +154,7 @@ public class MazeWilson extends MapCreator {
 		}
 	}
 
-	private Point findNextStartCell(Point lastStart) {
+	private Cell findNextStartCell(Cell lastStart) {
 		// search bottom to top, left to right, for a black cell with two
 		// adjacent black cells
 
@@ -168,7 +180,7 @@ public class MazeWilson extends MapCreator {
 				}
 
 				if (adjacentBlackCounter == 8) {
-					return new Point(x, y);
+					return new Cell(x, y);
 				}
 			}
 		}

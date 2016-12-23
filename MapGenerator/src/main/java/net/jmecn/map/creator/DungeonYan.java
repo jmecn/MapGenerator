@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.jmecn.map.Point;
+import net.jmecn.map.Rect;
 
 /**
  * This is my own dungeon algorithm.
@@ -295,16 +296,8 @@ public class DungeonYan extends MapCreator {
 		ROOM, CORRIDOR;
 	}
 
-	private class Room {
+	private class Room extends Rect {
 		Type type;
-
-		// size
-		int width;
-		int height;
-
-		// pos
-		int x = 0;
-		int y = 0;
 
 		// tiles
 		int[][] tiles;
@@ -316,11 +309,8 @@ public class DungeonYan extends MapCreator {
 		List<Room> children;
 
 		Room(int width, int height) {
-			assert width > 3;
-			assert height > 3;
+			super(0, 0, width, height);
 
-			this.width = width;
-			this.height = height;
 			tiles = new int[height][width];
 
 			doors = new ArrayList<Point>();
