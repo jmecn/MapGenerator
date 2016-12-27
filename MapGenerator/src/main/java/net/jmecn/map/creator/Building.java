@@ -7,6 +7,14 @@ import java.util.List;
 
 import net.jmecn.map.Point;
 
+/**
+ * Basic BSP Dungeon generation
+ * 
+ * http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation
+ * 
+ * @author yanmaoyuan
+ *
+ */
 public class Building extends MapCreator {
 
 	private int iterations;
