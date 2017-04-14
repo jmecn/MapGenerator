@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-16" standalone="yes" ?>
-<meshdesc version="4" effect_version="7">
-	<EffectGroup play_mode="loop" play_length="0" play="0">			
-		<Effect name="pet_heart_overhead_pet_c4_maplestory_fox01_s" parent="Head" effect_name="pet_heart_overhead"  align="parent" offset="0 0 40" rot_axis="-1 0 -1" rot_angle="90" />
-		</EffectGroup>
-</meshdesc>
