@@ -43,16 +43,11 @@ import javax.swing.event.ChangeListener;
 
 import net.jmecn.map.creator.Building;
 import net.jmecn.map.creator.CaveCellauto;
-import net.jmecn.map.creator.CaveDLA;
-import net.jmecn.map.creator.CityLeafVenation;
 import net.jmecn.map.creator.DungeonHauberk;
 import net.jmecn.map.creator.DungeonNickgravelyn;
-import net.jmecn.map.creator.DungeonTyrant;
 import net.jmecn.map.creator.DungeonYan;
 import net.jmecn.map.creator.ForestHauberk;
-import net.jmecn.map.creator.Islands;
 import net.jmecn.map.creator.MapCreator;
-import net.jmecn.map.creator.Maze;
 import net.jmecn.map.creator.MazeWilson;
 
 /**
@@ -148,17 +143,12 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		
 		mapCreators = new ArrayList<MapCreator>();
 		mapCreators.add(new ForestHauberk(width, height));
-		mapCreators.add(new CaveDLA(width, height));
 		mapCreators.add(new CaveCellauto(width, height));
 		mapCreators.add(new DungeonNickgravelyn(width, height));
 		mapCreators.add(new DungeonYan(width, height));
 		mapCreators.add(new DungeonHauberk(width, height));
-		mapCreators.add(new DungeonTyrant(width, height));
-		mapCreators.add(new Maze(width, height));
 		mapCreators.add(new MazeWilson(width, height));
-		mapCreators.add(new Islands(width, height));
 		mapCreators.add(new Building(width, height));
-		mapCreators.add(new CityLeafVenation(width, height));
 		
 	}
 	

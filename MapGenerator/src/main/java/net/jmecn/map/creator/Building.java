@@ -91,8 +91,15 @@ public class Building extends MapCreator {
 
 	private void split(Room room, int iteration) {
 		int limit = 2 * MIN + 1;
-		if (iteration < iterations && room.getWidth() > limit && room.getHeight() > limit) {
-			boolean splitVert = nextBoolean();
+		if (iteration < iterations && (room.getWidth() > limit || room.getHeight() > limit)) {
+		    boolean splitVert = false;
+		    if (room.getWidth() <= limit) {
+		        splitVert = false;
+		    } else if (room.getHeight() <= limit) {
+		        splitVert = true;
+		    } else {
+		        splitVert = nextBoolean();
+		    }
 
 			Room leftOrTop;
 			Room rightOrBottom;
