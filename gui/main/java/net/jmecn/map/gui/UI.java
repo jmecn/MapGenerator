@@ -48,6 +48,7 @@ import net.jmecn.map.creator.DungeonNickgravelyn;
 import net.jmecn.map.creator.DungeonYan;
 import net.jmecn.map.creator.ForestHauberk;
 import net.jmecn.map.creator.MapCreator;
+import net.jmecn.map.creator.Maze;
 import net.jmecn.map.creator.MazeWilson;
 
 /**
@@ -147,6 +148,7 @@ public class UI extends JFrame implements ActionListener, ChangeListener {
 		mapCreators.add(new DungeonNickgravelyn(width, height));
 		mapCreators.add(new DungeonYan(width, height));
 		mapCreators.add(new DungeonHauberk(width, height));
+		mapCreators.add(new Maze(width, height));
 		mapCreators.add(new MazeWilson(width, height));
 		mapCreators.add(new Building(width, height));
 		
